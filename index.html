@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โรงเรียนตัวอย่างวิทยา</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Mitr:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2d6d;
+    --navy-dark: #111e4a;
+    --navy-light: #2a3f8f;
+    --gold: #f5a623;
+    --gold-dark: #d4891a;
+    --white: #ffffff;
+    --gray-50: #f8f9fc;
+    --gray-100: #eef0f6;
+    --gray-200: #dde1ee;
+    --gray-500: #8892b0;
+    --gray-700: #4a5568;
+    --text: #1e2a4a;
+    --shadow-sm: 0 2px 8px rgba(26,45,109,0.08);
+    --shadow-md: 0 4px 20px rgba(26,45,109,0.12);
+    --shadow-lg: 0 8px 40px rgba(26,45,109,0.18);
+    --radius: 12px;
+    --radius-lg: 20px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--navy-dark);
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+    padding: 7px 0;
+  }
+  .topbar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .topbar-left span { display: flex; align-items: center; gap: 6px; }
+  .topbar-left span i { opacity: 0.7; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-right a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    transition: all .2s;
+  }
+  .topbar-right a:hover { background: rgba(255,255,255,0.15); color: white; }
+  .topbar-login {
+    background: var(--gold);
+    color: var(--navy-dark) !important;
+    padding: 4px 14px !important;
+    border-radius: 20px !important;
+    border: none !important;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .2s;
+    width: auto !important;
+    height: auto !important;
+  }
+  .topbar-login:hover { background: var(--gold-dark) !important; transform: translateY(-1px); }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    box-shadow: var(--shadow-sm);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
+  .logo-icon {
+    width: 52px; height: 52px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Mitr', sans-serif;
+    font-size: 20px; font-weight: 700; color: var(--gold);
+    letter-spacing: 1px;
+    box-shadow: 0 3px 12px rgba(26,45,109,0.3);
+  }
+  .logo-text { line-height: 1.2; }
+  .logo-text strong {
+    display: block; font-family: 'Mitr', sans-serif;
+    font-size: 17px; font-weight: 600; color: var(--navy);
+  }
+  .logo-text span { font-size: 12px; color: var(--gray-500); }
+  .search-bar {
+    flex: 1; max-width: 380px; margin-left: auto;
+    display: flex; align-items: center;
+    border: 1.5px solid var(--gray-200); border-radius: 40px;
+    overflow: hidden; background: var(--gray-50);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .search-bar:focus-within { border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(42,63,143,0.1); }
+  .search-bar input {
+    border: none; background: none; padding: 9px 16px;
+    font-family: 'Sarabun', sans-serif; font-size: 14px; color: var(--text);
+    outline: none; flex: 1;
+  }
+  .search-bar button {
+    background: var(--navy); color: white; border: none;
+    width: 40px; height: 40px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s; font-size: 15px;
+  }
+  .search-bar button:hover { background: var(--navy-light); }
+
+  /* ── NAV ── */
+  nav { background: var(--navy); }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    display: flex; align-items: center; gap: 2px;
+  }
+  .nav-inner a {
+    color: rgba(255,255,255,0.85); text-decoration: none;
+    padding: 14px 16px; font-size: 14.5px; font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+    position: relative; transition: color .2s;
+    white-space: nowrap;
+  }
+  .nav-inner a::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; right: 50%;
+    height: 3px; background: var(--gold); border-radius: 3px 3px 0 0;
+    transition: left .25s, right .25s;
+  }
+  .nav-inner a:hover, .nav-inner a.active { color: white; }
+  .nav-inner a:hover::after, .nav-inner a.active::after { left: 8px; right: 8px; }
+  .nav-inner a.active { color: var(--gold); font-weight: 600; }
+  .nav-arrow { font-size: 10px; opacity: 0.6; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, var(--navy-light) 100%);
+    position: relative; overflow: hidden; padding: 80px 24px 90px;
+    text-align: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 80% 50%, rgba(245,166,35,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(255,255,255,0.05) 0%, transparent 60%);
+  }
+  .hero-dots {
+    position: absolute; inset: 0; overflow: hidden;
+    background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.9); padding: 6px 18px; border-radius: 30px;
+    font-size: 13px; margin-bottom: 24px; backdrop-filter: blur(4px);
+  }
+  .hero h1 {
+    font-family: 'Mitr', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700; color: white; line-height: 1.25; margin-bottom: 10px;
+    animation: fadeUp .7s ease both;
+  }
+  .hero p {
+    font-size: 16px; color: rgba(255,255,255,0.75); margin-bottom: 36px;
+    animation: fadeUp .7s .15s ease both;
+  }
+  .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    animation: fadeUp .7s .3s ease both; }
+  .btn-gold {
+    background: var(--gold); color: var(--navy-dark);
+    padding: 13px 30px; border-radius: 40px; font-weight: 700;
+    font-family: 'Sarabun', sans-serif; font-size: 15px;
+    border: none; cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 20px rgba(245,166,35,0.4);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-gold:hover { background: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(245,166,35,0.5); }
+  .btn-outline {
+    background: transparent; color: white;
+    padding: 13px 30px; border-radius: 40px; font-weight: 600;
+    font-family: 'Sarabun', sans-serif; font-size: 15px;
+    border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all .2s;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: white; transform: translateY(-2px); }
+
+  /* ── STATS ── */
+  .stats {
+    background: white; padding: 0;
+    box-shadow: var(--shadow-md); position: relative; z-index: 10;
+    margin-top: -1px;
+  }
+  .stats-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+  }
+  .stat-item {
+    padding: 28px 24px; text-align: center;
+    border-right: 1px solid var(--gray-100);
+    position: relative; transition: background .2s;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item:hover { background: var(--gray-50); }
+  .stat-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: white; margin: 0 auto 10px;
+  }
+  .stat-num {
+    font-family: 'Mitr', sans-serif;
+    font-size: 32px; font-weight: 700; color: var(--navy);
+    line-height: 1;
+  }
+  .stat-label { font-size: 13.5px; color: var(--gray-500); margin-top: 4px; }
+
+  /* ── QUICK ACCESS ── */
+  .quick-access { background: var(--gray-50); padding: 48px 24px; }
+  .quick-inner { max-width: 1200px; margin: 0 auto; }
+  .quick-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 16px; margin-top: 8px;
+  }
+  .quick-item {
+    background: white; border-radius: var(--radius);
+    padding: 22px 10px 18px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text);
+    box-shadow: var(--shadow-sm); transition: all .25s;
+    border: 1.5px solid transparent;
+  }
+  .quick-item:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--navy-light);
+  }
+  .quick-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, #e8ecf8, #d4daf2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    transition: background .25s;
+  }
+  .quick-item:hover .quick-icon {
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+  }
+  .quick-item:hover .quick-icon span { filter: brightness(0) invert(1); }
+  .quick-label { font-size: 12.5px; font-weight: 600; text-align: center; color: var(--navy); }
+
+  /* ── SECTION TITLES ── */
+  .section { padding: 60px 24px; }
+  .section-alt { background: var(--gray-50); }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Mitr', sans-serif;
+    font-size: 26px; font-weight: 600; color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .section-title .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+  }
+  .section-subtitle { font-size: 14px; color: var(--gray-500); margin-bottom: 32px; }
+
+  /* ── FEATURED NEWS ── */
+  .featured-card {
+    display: grid; grid-template-columns: 1fr 420px; gap: 0;
+    border-radius: var(--radius-lg); overflow: hidden;
+    box-shadow: var(--shadow-md);
+    background: white;
+  }
+  .featured-img {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    min-height: 260px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .featured-img::before {
+    content: '📰';
+    font-size: 64px; opacity: 0.3;
+  }
+  .featured-badge {
+    position: absolute; top: 18px; left: 18px;
+    background: var(--gold); color: var(--navy-dark);
+    font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px;
+  }
+  .featured-body { padding: 36px; display: flex; flex-direction: column; justify-content: center; }
+  .featured-cat { font-size: 12px; font-weight: 700; color: var(--navy-light); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 12px; }
+  .featured-title { font-family: 'Mitr', sans-serif; font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.5; margin-bottom: 12px; }
+  .featured-desc { font-size: 14.5px; color: var(--gray-700); line-height: 1.7; margin-bottom: 20px; }
+  .featured-meta { font-size: 13px; color: var(--gray-500); display: flex; align-items: center; gap: 16px; }
+  .read-more {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--navy); color: white; padding: 10px 22px;
+    border-radius: 8px; font-size: 14px; font-weight: 600;
+    text-decoration: none; transition: all .2s; align-self: flex-start; margin-top: auto;
+  }
+  .read-more:hover { background: var(--navy-light); transform: translateX(2px); }
+
+  /* ── NEWS GRID ── */
+  .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .news-card {
+    background: white; border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow-sm); transition: all .25s;
+    display: flex; flex-direction: column;
+    border: 1px solid var(--gray-100);
+  }
+  .news-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .news-img {
+    height: 160px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; opacity: 0.7; position: relative;
+  }
+  .news-cat-badge {
+    position: absolute; top: 12px; left: 12px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    color: white;
+  }
+  .cat-news { background: #3b82f6; }
+  .cat-activity { background: #10b981; }
+  .cat-job { background: #f59e0b; }
+  .cat-procurement { background: #8b5cf6; }
+  .cat-academic { background: #ef4444; }
+  .news-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+  .news-meta { font-size: 12px; color: var(--gray-500); display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .news-title { font-weight: 600; font-size: 15px; color: var(--text); line-height: 1.55; margin-bottom: 10px; }
+  .news-excerpt { font-size: 13px; color: var(--gray-700); line-height: 1.65; flex: 1; }
+  .news-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--gray-100); }
+  .news-author { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--gray-500); }
+  .author-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--gray-200); display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .news-link { font-size: 12.5px; font-weight: 600; color: var(--navy-light); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+  .news-link:hover { color: var(--gold-dark); }
+  .load-more-wrap { text-align: center; margin-top: 36px; }
+  .btn-outline-navy {
+    border: 2px solid var(--navy); color: var(--navy); background: none;
+    padding: 11px 32px; border-radius: 40px; font-weight: 600; font-size: 15px;
+    cursor: pointer; font-family: 'Sarabun', sans-serif; transition: all .2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-outline-navy:hover { background: var(--navy); color: white; transform: translateY(-2px); }
+
+  /* ── GALLERY ── */
+  .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .gallery-item {
+    border-radius: var(--radius); overflow: hidden;
+    aspect-ratio: 4/3; position: relative; cursor: pointer;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px;
+  }
+  .gallery-item::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent 50%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .gallery-item:hover::after { opacity: 1; }
+  .gallery-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 12px; color: white; font-size: 12px; font-weight: 600;
+    z-index: 1; transform: translateY(100%); transition: transform .3s;
+    line-height: 1.4;
+  }
+  .gallery-item:hover .gallery-caption { transform: translateY(0); }
+
+  /* ── STAFF ── */
+  .staff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .staff-card {
+    background: white; border-radius: var(--radius-lg);
+    padding: 28px 20px; text-align: center;
+    box-shadow: var(--shadow-sm); transition: all .25s;
+    border: 1.5px solid var(--gray-100);
+  }
+  .staff-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--navy-light); }
+  .staff-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    margin: 0 auto 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: rgba(255,255,255,0.5);
+    border: 3px solid var(--gray-100);
+    box-shadow: 0 4px 16px rgba(26,45,109,0.2);
+  }
+  .staff-name { font-family: 'Mitr', sans-serif; font-size: 16px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+  .staff-role { font-size: 13px; color: var(--gray-500); margin-bottom: 14px; }
+  .staff-more { display: flex; justify-content: center; margin-top: 32px; }
+
+  /* ── FOOTER ── */
+  footer { background: var(--navy-dark); color: rgba(255,255,255,0.8); }
+  .footer-main { padding: 56px 24px; }
+  .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; }
+  .footer-brand .logo-text strong { color: white; }
+  .footer-brand .logo-text span { color: rgba(255,255,255,0.5); }
+  .footer-desc { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.75; margin: 16px 0; }
+  .footer-socials { display: flex; gap: 10px; }
+  .footer-socials a {
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.6); text-decoration: none;
+    font-size: 14px; transition: all .2s;
+  }
+  .footer-socials a:hover { background: var(--gold); color: var(--navy-dark); border-color: var(--gold); }
+  .footer-col h4 {
+    font-family: 'Mitr', sans-serif; font-size: 15px; font-weight: 600;
+    color: white; margin-bottom: 18px; padding-bottom: 10px;
+    border-bottom: 2px solid rgba(245,166,35,0.4);
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .footer-col ul li a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 14px; transition: color .2s; display: flex; align-items: center; gap: 6px; }
+  .footer-col ul li a::before { content: '›'; color: var(--gold); font-size: 16px; }
+  .footer-col ul li a:hover { color: var(--gold); }
+  .footer-contact { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 2; }
+  .footer-contact span { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 18px 24px; text-align: center;
+    font-size: 13px; color: rgba(255,255,255,0.4);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Mobile */
+  @media (max-width: 900px) {
+    .featured-card { grid-template-columns: 1fr; }
+    .news-grid { grid-template-columns: 1fr 1fr; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .staff-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .nav-inner { overflow-x: auto; }
+  }
+  @media (max-width: 600px) {
+    .news-grid { grid-template-columns: 1fr; }
+    .staff-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .topbar-left { display: none; }
+    .quick-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  /* ── เพิ่มสำหรับเชื่อมต่อหลังบ้าน: dropdown เมนู / modal / สถานะล็อกอิน ── */
+  .nav-item-wrap { position: relative; }
+  .nav-dropdown {
+    position: absolute; top: 100%; left: 0; min-width: 200px;
+    background: white; box-shadow: var(--shadow-md); border-radius: 0 0 10px 10px;
+    display: none; flex-direction: column; z-index: 50; overflow: hidden;
+  }
+  .nav-item-wrap:hover .nav-dropdown { display: flex; }
+  .nav-dropdown a {
+    color: var(--text) !important; padding: 10px 16px !important; font-size: 14px !important;
+    display: block !important;
+  }
+  .nav-dropdown a::after { display: none; }
+  .nav-dropdown a:hover { background: var(--gray-50); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(17,30,74,0.55);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white; border-radius: var(--radius-lg); max-width: 560px; width: 100%;
+    max-height: 85vh; overflow-y: auto; padding: 32px; position: relative;
+    box-shadow: var(--shadow-lg);
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px; background: var(--gray-100);
+    border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px;
+  }
+  .modal-box h3 { font-family:'Mitr',sans-serif; color: var(--navy); font-size: 20px; margin-bottom: 16px; }
+  .modal-box input {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+    margin-bottom: 12px; font-family:'Sarabun',sans-serif; font-size: 14px;
+  }
+  .modal-error { color: #dc2626; font-size: 13px; margin-bottom: 10px; }
+  .modal-box img { max-width: 100%; border-radius: var(--radius); margin-bottom: 16px; display: block; }
+  .admin-badge { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.85); }
+  .admin-badge button {
+    background: none; border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.8);
+    border-radius: 20px; padding: 3px 12px; font-size: 12px; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-left">
+      <span id="topbarAddress">📍 123 ถนนการศึกษา ตำบลวิทยา อำเภอเมือง จังหวัดตัวอย่าง 10100</span>
+      <span id="topbarPhone">📞 02-123-4567</span>
+      <span id="topbarEmail">✉️ contact@school.ac.th</span>
+    </div>
+    <div class="topbar-right">
+      <a href="#" title="Facebook" id="socialFacebook">f</a>
+      <a href="#" title="YouTube" id="socialYoutube">▶</a>
+      <a href="#" title="Instagram" id="socialInstagram">◉</a>
+      <span id="authArea"><a class="topbar-login" href="#" onclick="openLoginModal();return false;">เข้าสู่ระบบ</a></span>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon" id="logoIcon">ตว.</div>
+      <div class="logo-text">
+        <strong id="schoolName">โรงเรียนตัวอย่างวิทยา</strong>
+        <span id="schoolTagline">School of Excellence · มุ่งสู่ความเป็นเลิศ</span>
+      </div>
+    </a>
+    <div class="search-bar">
+      <input type="text" placeholder="ค้นหาข่าวสาร, บุคลากร..." id="searchInput">
+      <button id="searchBtn">🔍</button>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner" id="navMenu">
+    <a href="#" class="active">🏠 หน้าแรก</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-dots"></div>
+  <div class="hero-content">
+    <div class="hero-badge" id="heroBadge">🏫 ยินดีต้อนรับทุกท่าน</div>
+    <h1 id="heroHeading">ยินดีต้อนรับสู่<br>โรงเรียนตัวอย่างวิทยา</h1>
+    <p id="heroSubtitle">School of Excellence · มุ่งสู่ความเป็นเลิศ</p>
+    <div class="hero-btns" id="heroBtns">
+      <button class="btn-gold">รู้จักเรา →</button>
+      <button class="btn-outline">สมัครเรียน</button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-inner" id="statsContainer">
+    <div class="stat-item">
+      <div class="stat-icon">👨‍🎓</div>
+      <div class="stat-num">2,500+</div>
+      <div class="stat-label">นักเรียน</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">📚</div>
+      <div class="stat-num">8</div>
+      <div class="stat-label">กลุ่มสาระ</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">🚪</div>
+      <div class="stat-num">60</div>
+      <div class="stat-label">ห้องเรียน</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon">👩‍🏫</div>
+      <div class="stat-num">59</div>
+      <div class="stat-label">บุคลากรในสังคมสถาบัน</div>
+    </div>
+  </div>
+</section>
+
+<!-- QUICK ACCESS -->
+<section class="quick-access">
+  <div class="quick-inner">
+    <div class="quick-grid" id="quickAccessGrid">
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>📰</span></div>
+        <span class="quick-label">ประชาสัมพันธ์</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>📝</span></div>
+        <span class="quick-label">รับสมัครงาน</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>🛒</span></div>
+        <span class="quick-label">จัดซื้อจ้าง</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>⬇️</span></div>
+        <span class="quick-label">เอกสารดาวน์โหลด</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>🖼️</span></div>
+        <span class="quick-label">ภาพกิจกรรม</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>👥</span></div>
+        <span class="quick-label">ข้อมูลบุคลากร</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>📞</span></div>
+        <span class="quick-label">ติดต่อโรงเรียน</span>
+      </a>
+      <a class="quick-item" href="#">
+        <div class="quick-icon"><span>🏫</span></div>
+        <span class="quick-label">เว็บโรงเรียนใน</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED NEWS -->
+<section class="section" id="featuredNewsSection">
+  <div class="section-inner">
+    <div class="section-title"><span class="dot"></span>ข่าวสำคัญปักหมุด</div>
+    <p class="section-subtitle">ข่าวสารที่ควรรู้และติดตามอย่างเร่งด่วน</p>
+    <div class="featured-card" id="featuredNewsCard">
+      <div class="featured-img">
+        <span class="featured-badge">📌 ปักหมุด</span>
+      </div>
+      <div class="featured-body">
+        <div class="featured-cat">📢 ประชาสัมพันธ์ · 23 พ.ค. 2569</div>
+        <div class="featured-title">ประกาศเปิดภาคเรียนที่ 1 ปีการศึกษา 2569</div>
+        <div class="featured-desc">โรงเรียนตัวอย่างวิทยา ขอแจ้งกำหนดการเปิดภาคเรียนที่ 1 ปีการศึกษา 2569 และรายละเอียดสำคัญที่นักเรียนและผู้ปกครองควรทราบก่อนเปิดเทอม</div>
+        <div class="featured-meta">
+          <span>👤 admin</span>
+          <span>👁 542 ครั้ง</span>
+        </div>
+        <a class="read-more" href="#">อ่านต่อ →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS GRID -->
+<section class="section section-alt">
+  <div class="section-inner">
+    <div class="section-title"><span class="dot"></span>ข่าวสารล่าสุด</div>
+    <p class="section-subtitle">ติดตามข่าวสารความเคลื่อนไหวล่าสุดของโรงเรียน</p>
+    <div class="news-grid" id="newsGrid">
+      <!-- card 1 -->
+      <div class="news-card">
+        <div class="news-img" style="background:linear-gradient(135deg,#1a2d6d,#2a3f8f)">
+          📢<span class="news-cat-badge cat-news">ประชาสัมพันธ์</span>
+        </div>
+        <div class="news-body">
+          <div class="news-meta"><span>📅 23 พ.ค. 2569</span><span>👁 5 อ่าน</span></div>
+          <div class="news-title">ประกาศเปิดภาคเรียนที่ 1 ปีการศึกษา 2569</div>
+          <div class="news-excerpt">โรงเรียนตัวอย่างวิทยา ขอแจ้งกำหนดการเปิดภาคเรียนที่ 1 ปีการศึกษา 2569</div>
+          <div class="news-footer">
+            <span class="news-author"><span class="author-avatar">👤</span>admin</span>
+            <a class="news-link" href="#">อ่านต่อ →</a>
+          </div>
+        </div>
+      </div>
+      <!-- card 2 -->
+      <div class="news-card">
+        <div class="news-img" style="background:linear-gradient(135deg,#166534,#16a34a)">
+          🏆<span class="news-cat-badge cat-activity">ข่าวกิจกรรม</span>
+        </div>
+        <div class="news-body">
+          <div class="news-meta"><span>📅 23 พ.ค. 2569</span><span>👁 3 อ่าน</span></div>
+          <div class="news-title">กิจกรรมวันวิทยาศาสตร์แห่งชาติ ประจำปี 2569</div>
+          <div class="news-excerpt">นักเรียนเข้าร่วมกิจกรรมวันวิทยาศาสตร์ฯ จำนวน 18-20 สิงหาคมนี้</div>
+          <div class="news-footer">
+            <span class="news-author"><span class="author-avatar">👤</span>admin</span>
+            <a class="news-link" href="#">อ่านต่อ →</a>
+          </div>
+        </div>
+      </div>
+      <!-- card 3 -->
+      <div class="news-card">
+        <div class="news-img" style="background:linear-gradient(135deg,#6d1a6d,#9f3a9f)">
+          🛒<span class="news-cat-badge cat-procurement">จัดซื้อจ้าง</span>
+        </div>
+        <div class="news-body">
+          <div class="news-meta"><span>📅 23 พ.ค. 2569</span><span>👁 3 อ่าน</span></div>
+          <div class="news-title">ประกาศประกวดราคาจัดซื้อครุภัณฑ์คอมพิวเตอร์</div>
+          <div class="news-excerpt">โรงเรียนตัวอย่างวิทยา ประกาศประกวดราคาจัดซื้อครุภัณฑ์คอมพิวเตอร์ประจำปี 2569</div>
+          <div class="news-footer">
+            <span class="news-author"><span class="author-avatar">👤</span>admin</span>
+            <a class="news-link" href="#">อ่านต่อ →</a>
+          </div>
+        </div>
+      </div>
+      <!-- card 4 -->
+      <div class="news-card">
+        <div class="news-img" style="background:linear-gradient(135deg,#92400e,#d97706)">
+          💼<span class="news-cat-badge cat-job">รับสมัครงาน</span>
+        </div>
+        <div class="news-body">
+          <div class="news-meta"><span>📅 23 พ.ค. 2569</span><span>👁 4 อ่าน</span></div>
+          <div class="news-title">รับสมัครครูอัตราจ้าง วิชาภาษาอังกฤษ จำนวน 1 อัตรา</div>
+          <div class="news-excerpt">รับสมัครครูอัตราจ้างวิชาภาษาอังกฤษ อัตราเงินเดือน 15,000 บาท</div>
+          <div class="news-footer">
+            <span class="news-author"><span class="author-avatar">👤</span>admin</span>
+            <a class="news-link" href="#">อ่านต่อ →</a>
+          </div>
+        </div>
+      </div>
+      <!-- card 5 -->
+      <div class="news-card">
+        <div class="news-img" style="background:linear-gradient(135deg,#1e3a5f,#2563eb)">
+          📊<span class="news-cat-badge cat-academic">ผลงานนักเรียน</span>
+        </div>
+        <div class="news-body">
+          <div class="news-meta"><span>📅 23 พ.ค. 2569</span><span>👁 2 อ่าน</span></div>
+          <div class="news-title">นักเรียนคว้ารางวัลเหรียญทอง คณิตศาสตร์โอลิมปิก</div>
+          <div class="news-excerpt">นักเรียนโรงเรียนตัวอย่างวิทยา ได้รับรางวัลเหรียญทองในการแข่งขันคณิตศาสตร์โอลิมปิก</div>
+          <div class="news-footer">
+            <span class="news-author"><span class="author-avatar">👤</span>admin</span>
+            <a class="news-link" href="#">อ่านต่อ →</a>
+          </div>
+        </div>
+      </div>
+      <!-- card 6 -->
+      <div class="news-card">
+        <div class="news-img" style="background:linear-gradient(135deg,#1a2d6d,#374151)">
+          📢<span class="news-cat-badge cat-news">ประชาสัมพันธ์</span>
+        </div>
+        <div class="news-body">
+          <div class="news-meta"><span>📅 23 พ.ค. 2569</span><span>👁 2 อ่าน</span></div>
+          <div class="news-title">แจ้งหยุดเรียนกรณีพิเศษ ประจำเดือนพฤษภาคม</div>
+          <div class="news-excerpt">แจ้งกำหนดการหยุดเรียนกรณีพิเศษ สำหรับนักเรียนทุกระดับชั้น</div>
+          <div class="news-footer">
+            <span class="news-author"><span class="author-avatar">👤</span>admin</span>
+            <a class="news-link" href="#">อ่านต่อ →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="load-more-wrap">
+      <button class="btn-outline-navy" id="loadMoreNewsBtn">ดูทั้งหมด →</button>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-title"><span class="dot"></span>ภาพกิจกรรมเด่น</div>
+    <p class="section-subtitle">บันทึกความทรงจำจากกิจกรรมของโรงเรียน</p>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-item" style="background:linear-gradient(135deg,#1a2d6d,#2563eb)">🎓
+        <div class="gallery-caption">พิธีไหว้ครูประจำปี 2569</div>
+      </div>
+      <div class="gallery-item" style="background:linear-gradient(135deg,#166534,#22c55e)">🏃
+        <div class="gallery-caption">กิจกรรมวันสำคัญแห่งชาติ</div>
+      </div>
+      <div class="gallery-item" style="background:linear-gradient(135deg,#7c2d12,#f97316)">⚽
+        <div class="gallery-caption">กีฬาสีในโรงเรียน</div>
+      </div>
+      <div class="gallery-item" style="background:linear-gradient(135deg,#4c1d95,#8b5cf6)">🔬
+        <div class="gallery-caption">ค่ายวิทยาศาสตร์</div>
+      </div>
+    </div>
+    <div class="load-more-wrap">
+      <button class="btn-outline-navy" id="loadMoreGalleryBtn">ดูภาพทั้งหมด →</button>
+    </div>
+  </div>
+</section>
+
+<!-- STAFF -->
+<section class="section section-alt">
+  <div class="section-inner">
+    <div class="section-title"><span class="dot"></span>ผู้บริหารและบุคลากร</div>
+    <p class="section-subtitle">ทีมงานผู้ทุ่มเทเพื่อการศึกษาของนักเรียน</p>
+    <div class="staff-grid" id="staffGrid">
+      <div class="staff-card">
+        <div class="staff-avatar">👨‍💼</div>
+        <div class="staff-name">นายอำนาจ วิทยาลัย</div>
+        <div class="staff-role">ผู้อำนวยการ</div>
+      </div>
+      <div class="staff-card">
+        <div class="staff-avatar">👩‍💼</div>
+        <div class="staff-name">นางสมหญิง จัดการศน</div>
+        <div class="staff-role">รองผู้อำนวยการ ฝ่ายวิชาการ</div>
+      </div>
+      <div class="staff-card">
+        <div class="staff-avatar">👨‍💼</div>
+        <div class="staff-name">นายสยาม โดดี</div>
+        <div class="staff-role">รองผู้อำนวยการ ฝ่ายบุคคล</div>
+      </div>
+      <div class="staff-card">
+        <div class="staff-avatar">👩‍💼</div>
+        <div class="staff-name">นางวารุณี สดแม่ง</div>
+        <div class="staff-role">ส่วนตัวบริหาร ครั้ง 1 หัว</div>
+      </div>
+    </div>
+    <div class="staff-more">
+      <button class="btn-outline-navy" id="loadMoreStaffBtn">ดูบุคลากรทั้งหมด →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-main">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="margin-bottom:14px">
+          <div class="logo-icon" id="footerLogoIcon">ตว.</div>
+          <div class="logo-text footer-brand">
+            <strong id="footerSchoolName" style="color:white;font-family:'Mitr',sans-serif;font-size:17px">โรงเรียนตัวอย่างวิทยา</strong>
+            <span id="footerTagline" style="font-size:12px;color:rgba(255,255,255,.5)">School of Excellence · มุ่งสู่ความเป็นเลิศ</span>
+          </div>
+        </div>
+        <p class="footer-desc" id="footerDesc">โรงเรียนตัวอย่างวิทยา มุ่งมั่นพัฒนาผู้เรียนให้มีคุณภาพ คุณธรรม และทักษะสำหรับศตวรรษที่ 21</p>
+        <div class="footer-socials">
+          <a href="#" id="footerFacebook">f</a>
+          <a href="#" id="footerYoutube">▶</a>
+          <a href="#" id="footerInstagram">◉</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>ลิงก์ด่วน</h4>
+        <ul id="footerQuickLinks">
+          <li><a href="#">หน้าแรก</a></li>
+          <li><a href="#">เกี่ยวกับโรงเรียน</a></li>
+          <li><a href="#">บุคลากร</a></li>
+          <li><a href="#">ข่าวสาร</a></li>
+          <li><a href="#">ภาพกิจกรรม</a></li>
+          <li><a href="#">ติดต่อเรา</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>สำหรับผู้ปกครอง</h4>
+        <ul id="footerParentLinks">
+          <li><a href="#">สมัครเรียน</a></li>
+          <li><a href="#">ตรวจสอบผลการเรียน</a></li>
+          <li><a href="#">ปฏิทินการศึกษา</a></li>
+          <li><a href="#">ข้อมูลค่าใช้จ่าย</a></li>
+          <li><a href="#">เข้าสู่ระบบผู้ปกครอง</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>ติดต่อเรา</h4>
+        <div class="footer-contact" id="footerContact">
+          <span>📍 123 ถนนการศึกษา ตำบลวิทยา อำเภอเมือง จังหวัดตัวอย่าง 10100</span>
+          <span>📞 02-123-4567</span>
+          <span>✉️ contact@school.ac.th</span>
+          <span>🕐 จ.-ศ. 08.00–16.30 น.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom" id="footerBottom">
+    © 2569 โรงเรียนตัวอย่างวิทยา · พัฒนาโดย SchoolWeb System · สงวนลิขสิทธิ์ทุกประการ
+  </div>
+</footer>
+
+<script>
+/* ==========================================================================
+   เชื่อมต่อกับระบบหลังบ้าน Google Apps Script
+   ⚠️ ต้องตั้งค่า WEB_APP_URL ให้เป็น Web app URL ที่ deploy ไว้จริง (ลงท้ายด้วย /exec)
+   ก่อนไฟล์นี้จะทำงานได้ — ดูวิธี deploy ได้ในไฟล์ README.md ของชุด Apps Script
+   ========================================================================== */
+const WEB_APP_URL = 'วาง_WEB_APP_URL_ของคุณตรงนี้';
+const NEWS_PAGE_SIZE = 6;
+const STAFF_PAGE_SIZE = 4;
+const GALLERY_PAGE_SIZE = 4;
+
+let authToken = localStorage.getItem('sw_token') || null;
+let authRole = localStorage.getItem('sw_role') || null;
+let authName = localStorage.getItem('sw_name') || null;
+let newsOffset = 0;
+let allStaff = [];
+let allAlbums = [];
+
+// --- เรียก API กลาง ---
+async function apiGet(action, params) {
+  params = params || {};
+  const qs = new URLSearchParams(Object.assign({ action: action }, params)).toString();
+  const res = await fetch(WEB_APP_URL + '?' + qs);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+
+async function apiPost(action, body) {
+  const res = await fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify(Object.assign({ action: action }, body))
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function driveImageUrl(fileId) {
+  return 'https://drive.google.com/uc?export=view&id=' + fileId;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+}
+
+/* ==========================================================================
+   ค่าตั้งค่าเว็บไซต์ (Settings) — topbar / ชื่อโรงเรียน / footer
+   ========================================================================== */
+async function loadSettings() {
+  try {
+    const s = await apiGet('getSettings');
+    if (s.address) document.getElementById('topbarAddress').textContent = '📍 ' + s.address;
+    if (s.phone) document.getElementById('topbarPhone').textContent = '📞 ' + s.phone;
+    if (s.email) document.getElementById('topbarEmail').textContent = '✉️ ' + s.email;
+    if (s.fb_url) { document.getElementById('socialFacebook').href = s.fb_url; document.getElementById('footerFacebook').href = s.fb_url; }
+    if (s.yt_url) { document.getElementById('socialYoutube').href = s.yt_url; document.getElementById('footerYoutube').href = s.yt_url; }
+    if (s.ig_url) { document.getElementById('socialInstagram').href = s.ig_url; document.getElementById('footerInstagram').href = s.ig_url; }
+
+    if (s.school_name_th) {
+      document.getElementById('schoolName').textContent = s.school_name_th;
+      document.getElementById('footerSchoolName').textContent = s.school_name_th;
+      document.title = s.school_name_th;
+    }
+    if (s.tagline) {
+      document.getElementById('schoolTagline').textContent = s.tagline;
+      document.getElementById('footerTagline').textContent = s.tagline;
+    }
+    if (s.logo_drive_id) {
+      const logoHtml = '<img src="' + driveImageUrl(s.logo_drive_id) + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px">';
+      document.getElementById('logoIcon').innerHTML = logoHtml;
+      document.getElementById('footerLogoIcon').innerHTML = logoHtml;
+    }
+    if (s.footer_desc) document.getElementById('footerDesc').textContent = s.footer_desc;
+    if (s.copyright_text) document.getElementById('footerBottom').textContent = s.copyright_text;
+
+    const contactHtml = [];
+    if (s.address) contactHtml.push('<span>📍 ' + escapeHtml(s.address) + '</span>');
+    if (s.phone) contactHtml.push('<span>📞 ' + escapeHtml(s.phone) + '</span>');
+    if (s.email) contactHtml.push('<span>✉️ ' + escapeHtml(s.email) + '</span>');
+    if (s.office_hours) contactHtml.push('<span>🕐 ' + escapeHtml(s.office_hours) + '</span>');
+    if (contactHtml.length) document.getElementById('footerContact').innerHTML = contactHtml.join('');
+  } catch (err) {
+    console.warn('โหลด Settings ไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   เมนูหลัก (รองรับเมนูย่อยแบบ dropdown) + เมนู Footer
+   ========================================================================== */
+async function loadMenu() {
+  try {
+    const items = await apiGet('getMainMenu');
+    const nav = document.getElementById('navMenu');
+    items.forEach(item => {
+      if (item.children && item.children.length) {
+        const wrap = document.createElement('div');
+        wrap.className = 'nav-item-wrap';
+        wrap.innerHTML =
+          '<a href="' + (item.link_value || '#') + '">' + escapeHtml(item.label) + ' <span class="nav-arrow">▾</span></a>' +
+          '<div class="nav-dropdown">' +
+          item.children.map(c => '<a href="' + (c.link_value || '#') + '">' + escapeHtml(c.label) + '</a>').join('') +
+          '</div>';
+        nav.appendChild(wrap);
+      } else {
+        const a = document.createElement('a');
+        a.href = item.link_value || '#';
+        a.textContent = item.label;
+        nav.appendChild(a);
+      }
+    });
+  } catch (err) {
+    console.warn('โหลดเมนูไม่สำเร็จ:', err.message);
+  }
+}
+
+async function loadFooterMenu() {
+  try {
+    const grouped = await apiGet('getFooterMenu');
+    if (grouped['ลิงก์ด่วน']) {
+      document.getElementById('footerQuickLinks').innerHTML =
+        grouped['ลิงก์ด่วน'].map(l => '<li><a href="' + (l.link || '#') + '">' + escapeHtml(l.label) + '</a></li>').join('');
+    }
+    if (grouped['สำหรับผู้ปกครอง']) {
+      document.getElementById('footerParentLinks').innerHTML =
+        grouped['สำหรับผู้ปกครอง'].map(l => '<li><a href="' + (l.link || '#') + '">' + escapeHtml(l.label) + '</a></li>').join('');
+    }
+  } catch (err) {
+    console.warn('โหลดเมนู footer ไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   Hero — ใช้สไลด์แรกที่ active (โครงสร้างรองรับหลายสไลด์ในอนาคต)
+   ========================================================================== */
+async function loadHero() {
+  try {
+    const slides = await apiGet('getHeroSlides');
+    if (!slides.length) return;
+    const s = slides[0];
+    if (s.badge_text) document.getElementById('heroBadge').textContent = s.badge_text;
+    if (s.heading) document.getElementById('heroHeading').innerHTML = escapeHtml(s.heading).replace(/\n/g, '<br>');
+    if (s.subtitle) document.getElementById('heroSubtitle').textContent = s.subtitle;
+    const btnsHtml = [];
+    if (s.cta1_text) btnsHtml.push('<a class="btn-gold" style="text-decoration:none" href="' + (s.cta1_link || '#') + '">' + escapeHtml(s.cta1_text) + '</a>');
+    if (s.cta2_text) btnsHtml.push('<a class="btn-outline" style="text-decoration:none" href="' + (s.cta2_link || '#') + '">' + escapeHtml(s.cta2_text) + '</a>');
+    if (btnsHtml.length) document.getElementById('heroBtns').innerHTML = btnsHtml.join('');
+  } catch (err) {
+    console.warn('โหลด Hero ไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   สถิติหน้าแรก
+   ========================================================================== */
+async function loadStats() {
+  try {
+    const stats = await apiGet('getStats');
+    if (!stats.length) return;
+    document.getElementById('statsContainer').innerHTML = stats.map(s =>
+      '<div class="stat-item"><div class="stat-icon">' + escapeHtml(s.icon) + '</div>' +
+      '<div class="stat-num">' + escapeHtml(s.number) + '</div>' +
+      '<div class="stat-label">' + escapeHtml(s.label) + '</div></div>'
+    ).join('');
+  } catch (err) {
+    console.warn('โหลด Stats ไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   ทางลัด (Quick Access)
+   ========================================================================== */
+async function loadQuickAccess() {
+  try {
+    const items = await apiGet('getQuickAccess');
+    if (!items.length) return;
+    document.getElementById('quickAccessGrid').innerHTML = items.map(q =>
+      '<a class="quick-item" href="' + (q.link_value || '#') + '">' +
+      '<div class="quick-icon"><span>' + escapeHtml(q.icon) + '</span></div>' +
+      '<span class="quick-label">' + escapeHtml(q.label) + '</span></a>'
+    ).join('');
+  } catch (err) {
+    console.warn('โหลด Quick Access ไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   ข่าว — ปักหมุด + กริดล่าสุด (แบ่งหน้าด้วยปุ่ม "ดูทั้งหมด")
+   ========================================================================== */
+const CATEGORY_STYLE = {
+  'ประชาสัมพันธ์': { icon: '📢', cls: 'cat-news', bg: 'linear-gradient(135deg,#1a2d6d,#2a3f8f)' },
+  'ข่าวกิจกรรม': { icon: '🏆', cls: 'cat-activity', bg: 'linear-gradient(135deg,#166534,#16a34a)' },
+  'จัดซื้อจ้าง': { icon: '🛒', cls: 'cat-procurement', bg: 'linear-gradient(135deg,#6d1a6d,#9f3a9f)' },
+  'รับสมัครงาน': { icon: '💼', cls: 'cat-job', bg: 'linear-gradient(135deg,#92400e,#d97706)' },
+  'ผลงานนักเรียน': { icon: '📊', cls: 'cat-academic', bg: 'linear-gradient(135deg,#1e3a5f,#2563eb)' }
+};
+
+function newsCardHtml(n) {
+  const style = CATEGORY_STYLE[n.category] || CATEGORY_STYLE['ประชาสัมพันธ์'];
+  const imgStyle = n.image_drive_id
+    ? 'background-image:url(' + driveImageUrl(n.image_drive_id) + ');background-size:cover;background-position:center'
+    : 'background:' + style.bg;
+  return '<div class="news-card">' +
+    '<div class="news-img" style="' + imgStyle + '">' + (n.image_drive_id ? '' : style.icon) +
+    '<span class="news-cat-badge ' + style.cls + '">' + escapeHtml(n.category) + '</span></div>' +
+    '<div class="news-body">' +
+    '<div class="news-meta"><span>📅 ' + formatDate(n.published_date) + '</span><span>👁 ' + (n.views || 0) + ' อ่าน</span></div>' +
+    '<div class="news-title">' + escapeHtml(n.title) + '</div>' +
+    '<div class="news-excerpt">' + escapeHtml(n.excerpt) + '</div>' +
+    '<div class="news-footer"><span class="news-author"><span class="author-avatar">👤</span>admin</span>' +
+    '<a class="news-link" href="#" onclick="openNewsModal(\'' + n.id + '\');return false;">อ่านต่อ →</a></div>' +
+    '</div></div>';
+}
+
+async function loadFeaturedNews() {
+  try {
+    const news = await apiGet('getPinnedNews');
+    const section = document.getElementById('featuredNewsSection');
+    if (!news) { section.style.display = 'none'; return; }
+    const imgStyle = news.image_drive_id
+      ? 'background-image:url(' + driveImageUrl(news.image_drive_id) + ');background-size:cover;background-position:center'
+      : '';
+    document.getElementById('featuredNewsCard').innerHTML =
+      '<div class="featured-img" style="' + imgStyle + '"><span class="featured-badge">📌 ปักหมุด</span></div>' +
+      '<div class="featured-body">' +
+      '<div class="featured-cat">📢 ' + escapeHtml(news.category) + ' · ' + formatDate(news.published_date) + '</div>' +
+      '<div class="featured-title">' + escapeHtml(news.title) + '</div>' +
+      '<div class="featured-desc">' + escapeHtml(news.excerpt) + '</div>' +
+      '<div class="featured-meta"><span>👁 ' + (news.views || 0) + ' ครั้ง</span></div>' +
+      '<a class="read-more" href="#" onclick="openNewsModal(\'' + news.id + '\');return false;">อ่านต่อ →</a>' +
+      '</div>';
+  } catch (err) {
+    console.warn('โหลดข่าวปักหมุดไม่สำเร็จ:', err.message);
+  }
+}
+
+async function loadNewsGrid(reset) {
+  try {
+    if (reset) newsOffset = 0;
+    const result = await apiGet('getNews', { limit: NEWS_PAGE_SIZE, offset: newsOffset });
+    const grid = document.getElementById('newsGrid');
+    if (reset) grid.innerHTML = '';
+    grid.innerHTML += result.items.map(newsCardHtml).join('');
+    newsOffset += result.items.length;
+    document.getElementById('loadMoreNewsBtn').style.display = newsOffset >= result.total ? 'none' : 'inline-flex';
+  } catch (err) {
+    console.warn('โหลดข่าวไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   แกลเลอรี — แสดงเป็นอัลบั้ม คลิกเพื่อดูภาพทั้งหมดในอัลบั้ม
+   ========================================================================== */
+async function loadGallery() {
+  try {
+    allAlbums = await apiGet('getAlbums');
+    renderGallery(GALLERY_PAGE_SIZE);
+  } catch (err) {
+    console.warn('โหลดแกลเลอรีไม่สำเร็จ:', err.message);
+  }
+}
+
+function renderGallery(count) {
+  const list = count ? allAlbums.slice(0, count) : allAlbums;
+  document.getElementById('galleryGrid').innerHTML = list.map(a => {
+    const bg = a.cover_image_drive_id
+      ? 'background-image:url(' + driveImageUrl(a.cover_image_drive_id) + ');background-size:cover;background-position:center'
+      : 'background:linear-gradient(135deg,#1a2d6d,#2563eb)';
+    return '<div class="gallery-item" style="' + bg + '" onclick="openAlbumModal(\'' + a.id + '\')">' +
+      (a.cover_image_drive_id ? '' : '🖼️') +
+      '<div class="gallery-caption">' + escapeHtml(a.title) + '</div></div>';
+  }).join('');
+  document.getElementById('loadMoreGalleryBtn').style.display = (count && allAlbums.length > count) ? 'inline-flex' : 'none';
+}
+
+/* ==========================================================================
+   บุคลากร
+   ========================================================================== */
+async function loadStaff() {
+  try {
+    allStaff = await apiGet('getStaff');
+    renderStaff(STAFF_PAGE_SIZE);
+  } catch (err) {
+    console.warn('โหลดบุคลากรไม่สำเร็จ:', err.message);
+  }
+}
+
+function renderStaff(count) {
+  const list = count ? allStaff.slice(0, count) : allStaff;
+  document.getElementById('staffGrid').innerHTML = list.map(s => {
+    const avatar = s.photo_drive_id
+      ? '<img src="' + driveImageUrl(s.photo_drive_id) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'
+      : '👤';
+    return '<div class="staff-card"><div class="staff-avatar">' + avatar + '</div>' +
+      '<div class="staff-name">' + escapeHtml(s.name) + '</div>' +
+      '<div class="staff-role">' + escapeHtml(s.position) + '</div></div>';
+  }).join('');
+  document.getElementById('loadMoreStaffBtn').style.display = (count && allStaff.length > count) ? 'inline-flex' : 'none';
+}
+
+/* ==========================================================================
+   Modal กลาง — ใช้แสดงรายละเอียดข่าว / อัลบั้มภาพ / ฟอร์มล็อกอิน
+   ========================================================================== */
+function ensureModal() {
+  if (document.getElementById('modalOverlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'modalOverlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = '<div class="modal-box" id="modalBox"></div>';
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.body.appendChild(overlay);
+}
+function openModal(html) {
+  ensureModal();
+  document.getElementById('modalBox').innerHTML = '<button class="modal-close" onclick="closeModal()">✕</button>' + html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+async function openNewsModal(id) {
+  try {
+    const n = await apiGet('getNewsById', { id: id });
+    const img = n.image_drive_id ? '<img src="' + driveImageUrl(n.image_drive_id) + '">' : '';
+    openModal(img +
+      '<div class="featured-cat">📢 ' + escapeHtml(n.category) + ' · ' + formatDate(n.published_date) + '</div>' +
+      '<h3>' + escapeHtml(n.title) + '</h3>' +
+      '<div style="line-height:1.8;color:var(--gray-700)">' + (n.content_html || escapeHtml(n.excerpt)) + '</div>');
+  } catch (err) {
+    openModal('<p>ไม่สามารถโหลดข่าวได้: ' + escapeHtml(err.message) + '</p>');
+  }
+}
+
+async function openAlbumModal(albumId) {
+  try {
+    const album = await apiGet('getAlbumWithPhotos', { albumId: albumId });
+    const photosHtml = album.photos.map(p => '<img src="' + driveImageUrl(p.image_drive_id) + '">').join('')
+      || '<p>ยังไม่มีภาพในอัลบั้มนี้</p>';
+    openModal('<h3>' + escapeHtml(album.title) + '</h3>' + photosHtml);
+  } catch (err) {
+    openModal('<p>ไม่สามารถโหลดอัลบั้มได้: ' + escapeHtml(err.message) + '</p>');
+  }
+}
+
+/* ==========================================================================
+   ระบบล็อกอินแอดมิน/เอดิเตอร์ — เก็บ token ไว้ใน localStorage
+   ========================================================================== */
+function renderAuthArea() {
+  const area = document.getElementById('authArea');
+  if (authToken && authName) {
+    area.innerHTML = '<span class="admin-badge">👤 ' + escapeHtml(authName) +
+      ' <button onclick="doLogout()">ออกจากระบบ</button></span>';
+  } else {
+    area.innerHTML = '<a class="topbar-login" href="#" onclick="openLoginModal();return false;">เข้าสู่ระบบ</a>';
+  }
+}
+
+function openLoginModal() {
+  openModal(
+    '<h3>เข้าสู่ระบบผู้ดูแลระบบ</h3>' +
+    '<div id="loginError" class="modal-error" style="display:none"></div>' +
+    '<input type="text" id="loginUsername" placeholder="ชื่อผู้ใช้">' +
+    '<input type="password" id="loginPassword" placeholder="รหัสผ่าน">' +
+    '<button class="btn-gold" style="width:100%;justify-content:center" onclick="doLogin()">เข้าสู่ระบบ</button>'
+  );
+}
+
+async function doLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  try {
+    const result = await apiPost('login', { username: username, password: password });
+    authToken = result.token; authRole = result.role; authName = result.display_name;
+    localStorage.setItem('sw_token', authToken);
+    localStorage.setItem('sw_role', authRole);
+    localStorage.setItem('sw_name', authName);
+    closeModal();
+    renderAuthArea();
+  } catch (err) {
+    errBox.textContent = err.message;
+    errBox.style.display = 'block';
+  }
+}
+
+async function doLogout() {
+  try { if (authToken) await apiPost('logout', { token: authToken }); } catch (e) { /* เพิกเฉยถ้าเรียกไม่สำเร็จ ยังไงก็ล้าง token ฝั่งเราอยู่ดี */ }
+  authToken = authRole = authName = null;
+  localStorage.removeItem('sw_token'); localStorage.removeItem('sw_role'); localStorage.removeItem('sw_name');
+  renderAuthArea();
+}
+
+async function checkExistingSession() {
+  if (!authToken) { renderAuthArea(); return; }
+  try {
+    await apiGet('checkSession', { token: authToken });
+    renderAuthArea();
+  } catch (err) {
+    authToken = authRole = authName = null;
+    localStorage.removeItem('sw_token'); localStorage.removeItem('sw_role'); localStorage.removeItem('sw_name');
+    renderAuthArea();
+  }
+}
+
+/* ==========================================================================
+   ค้นหาข่าว — แบบง่าย กรองที่ฝั่งหน้าเว็บจากข่าวที่เผยแพร่แล้วทั้งหมด
+   ========================================================================== */
+async function doSearch() {
+  const term = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!term) return;
+  try {
+    const result = await apiGet('getNews', { limit: 200 });
+    const filtered = result.items.filter(n =>
+      (n.title || '').toLowerCase().includes(term) || (n.excerpt || '').toLowerCase().includes(term)
+    );
+    document.getElementById('newsGrid').innerHTML = filtered.length
+      ? filtered.map(newsCardHtml).join('')
+      : '<p style="grid-column:1/-1;text-align:center;color:var(--gray-500)">ไม่พบข่าวที่ตรงกับ "' + escapeHtml(term) + '"</p>';
+    document.getElementById('loadMoreNewsBtn').style.display = 'none';
+    document.getElementById('newsGrid').scrollIntoView({ behavior: 'smooth' });
+  } catch (err) {
+    console.warn('ค้นหาไม่สำเร็จ:', err.message);
+  }
+}
+
+/* ==========================================================================
+   เริ่มโหลดทุกอย่างเมื่อเปิดหน้าเว็บ
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', function () {
+  checkExistingSession();
+  loadSettings();
+  loadMenu();
+  loadFooterMenu();
+  loadHero();
+  loadStats();
+  loadQuickAccess();
+  loadFeaturedNews();
+  loadNewsGrid(true);
+  loadGallery();
+  loadStaff();
+
+  document.getElementById('loadMoreNewsBtn').addEventListener('click', function () { loadNewsGrid(false); });
+  document.getElementById('loadMoreGalleryBtn').addEventListener('click', function () { renderGallery(0); });
+  document.getElementById('loadMoreStaffBtn').addEventListener('click', function () { renderStaff(0); });
+  document.getElementById('searchBtn').addEventListener('click', doSearch);
+  document.getElementById('searchInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') doSearch(); });
+});
+</script>
+
+</body>
+</html>
