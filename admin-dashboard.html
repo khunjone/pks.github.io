@@ -252,16 +252,17 @@
     <h1>ระบบจัดการเว็บไซต์</h1>
     <p class="sub">โรงเรียนตัวอย่างวิทยา</p>
     <div id="loginError" class="error-box"></div>
-    <div class="field">
-      <label>ชื่อผู้ใช้</label>
-      <input type="text" id="loginUsername" placeholder="username" autocomplete="username">
+    <div id="loginSection">
+      <form id="loginForm">
+        <!-- แนะนำให้ใส่ autocomplete="username" ไว้ที่ช่อง username ด้วยครับ -->
+        <input type="text" id="loginUsername" placeholder="Username" autocomplete="username">
+    
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    
+        <!-- เปลี่ยนปุ่มเป็น type="submit" -->
+        <button type="submit" id="loginBtn">Login</button>
+      </form>
     </div>
-    <div class="field">
-      <label>รหัสผ่าน</label>
-      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
-    </div>
-    <button class="btn btn-gold btn-block" id="loginSubmitBtn">เข้าสู่ระบบ</button>
-  </div>
 </div>
 
 <!-- APP SHELL -->
@@ -368,12 +369,13 @@ document.getElementById('modalOverlay').addEventListener('click', function (e) {
 /* ==========================================================================
    ระบบล็อกอิน
    ========================================================================== */
-document.getElementById('loginSubmitBtn').addEventListener('click', doLogin);
-document.getElementById('loginPassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+// มาเป็นการดักจับ form submit แทน
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+  event.preventDefault(); // คำสั่งนี้สำคัญมาก! ป้องกันไม่ให้หน้าเว็บรีโหลด
 
 async function doLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
+  const usernameVal = document.getElementById('loginUsername').value;
+  const passwordVal = document.getElementById('loginPassword').value;
   const errBox = document.getElementById('loginError');
   errBox.style.display = 'none';
   if (!username || !password) return;
