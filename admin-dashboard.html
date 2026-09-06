@@ -253,19 +253,16 @@
     <h1>ระบบจัดการเว็บไซต์</h1>
     <p class="sub">โรงเรียนตัวอย่างวิทยา</p>
     <div id="loginError" class="error-box"></div>
-      <form id="loginForm">
-        <!-- จับคู่ for="loginUsername" กับ id="loginUsername" -->
-        <div class="field">
-          <label for="loginUsername">ชื่อผู้ใช้งาน (Username):</label>
-          <input type="text" id="loginUsername" placeholder="Username" required>
-        </div>
-        <!-- จับคู่ for="loginPassword" กับ id="loginPassword" -->
-        <div class="field">
-          <label for="loginPassword">รหัสผ่าน (Password):</label>
-          <input type="password" id="loginPassword" placeholder="Password" required>
-        </div>
-        <button class="btn btn-gold btn-block" type="submit" id="loginSubmitBtn">เข้าสู่ระบบ</button>
-      </form>
+    <div class="field">
+      <label>ชื่อผู้ใช้</label>
+      <input type="text" id="loginUsername" placeholder="username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-gold btn-block" id="loginSubmitBtn">เข้าสู่ระบบ</button>
+  </div>
 </div>
 
 <!-- APP SHELL -->
@@ -372,7 +369,7 @@ document.getElementById('modalOverlay').addEventListener('click', function (e) {
 /* ==========================================================================
    ระบบล็อกอิน
    ========================================================================== */
-document.getElementById('loginSubmitBtn').addEventListener('submit', doLogin);
+document.getElementById('loginSubmitBtn').addEventListener('click', doLogin);
 document.getElementById('loginPassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
 
 async function doLogin() {
