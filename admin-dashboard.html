@@ -372,7 +372,7 @@ document.getElementById('modalOverlay').addEventListener('click', function (e) {
 /* ==========================================================================
    ระบบล็อกอิน
    ========================================================================== */
-document.getElementById('loginSubmitBtn').addEventListener('click', doLogin);
+document.getElementById('loginSubmitBtn').addEventListener('submit', doLogin);
 document.getElementById('loginPassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
 
 async function doLogin() {
