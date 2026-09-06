@@ -411,7 +411,7 @@ async function checkSessionAndEnter() {
 }
 
 function enterApp() {
-  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('Screen').style.display = 'none';
   document.getElementById('appShell').classList.add('active');
   document.getElementById('currentUserName').textContent = authName;
   document.getElementById('currentUserRole').textContent = authRole === 'admin' ? 'ผู้ดูแลระบบ' : 'เอดิเตอร์';
