@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>โรงเรียนวัดโป่งก้อนเส้า</title>
+<title>โรงเรียนตัวอย่างวิทยา</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Mitr:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -526,7 +526,7 @@
       <a href="#" title="Facebook" id="socialFacebook">f</a>
       <a href="#" title="YouTube" id="socialYoutube">▶</a>
       <a href="#" title="Instagram" id="socialInstagram">◉</a>
-      <span id="authArea"><a class="topbar-login" href="#" onclick="openLoginModal();return false;">เข้าสู่ระบบ</a></span>
+      <span id="authArea"><a class="topbar-login" href="admin-dashboard.html">เข้าสู่ระบบ</a></span>
     </div>
   </div>
 </div>
@@ -886,9 +886,6 @@ const NEWS_PAGE_SIZE = 6;
 const STAFF_PAGE_SIZE = 4;
 const GALLERY_PAGE_SIZE = 4;
 
-let authToken = localStorage.getItem('sw_token') || null;
-let authRole = localStorage.getItem('sw_role') || null;
-let authName = localStorage.getItem('sw_name') || null;
 let newsOffset = 0;
 let allStaff = [];
 let allAlbums = [];
@@ -1231,66 +1228,6 @@ async function openAlbumModal(albumId) {
 }
 
 /* ==========================================================================
-   ระบบล็อกอินแอดมิน/เอดิเตอร์ — เก็บ token ไว้ใน localStorage
-   ========================================================================== */
-function renderAuthArea() {
-  const area = document.getElementById('authArea');
-  if (authToken && authName) {
-    area.innerHTML = '<span class="admin-badge">👤 ' + escapeHtml(authName) +
-      ' <button onclick="doLogout()">ออกจากระบบ</button></span>';
-  } else {
-    area.innerHTML = '<a class="topbar-login" href="#" onclick="openLoginModal();return false;">เข้าสู่ระบบ</a>';
-  }
-}
-
-function openLoginModal() {
-  openModal(
-    '<h3>เข้าสู่ระบบผู้ดูแลระบบ</h3>' +
-    '<div id="loginError" class="modal-error" style="display:none"></div>' +
-    '<input type="text" id="loginUsername" placeholder="ชื่อผู้ใช้">' +
-    '<input type="password" id="loginPassword" placeholder="รหัสผ่าน">' +
-    '<button class="btn-gold" style="width:100%;justify-content:center" onclick="doLogin()">เข้าสู่ระบบ</button>'
-  );
-}
-
-async function doLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errBox = document.getElementById('loginError');
-  try {
-    const result = await apiPost('login', { username: username, password: password });
-    authToken = result.token; authRole = result.role; authName = result.display_name;
-    localStorage.setItem('sw_token', authToken);
-    localStorage.setItem('sw_role', authRole);
-    localStorage.setItem('sw_name', authName);
-    closeModal();
-    renderAuthArea();
-  } catch (err) {
-    errBox.textContent = err.message;
-    errBox.style.display = 'block';
-  }
-}
-
-async function doLogout() {
-  try { if (authToken) await apiPost('logout', { token: authToken }); } catch (e) { /* เพิกเฉยถ้าเรียกไม่สำเร็จ ยังไงก็ล้าง token ฝั่งเราอยู่ดี */ }
-  authToken = authRole = authName = null;
-  localStorage.removeItem('sw_token'); localStorage.removeItem('sw_role'); localStorage.removeItem('sw_name');
-  renderAuthArea();
-}
-
-async function checkExistingSession() {
-  if (!authToken) { renderAuthArea(); return; }
-  try {
-    await apiGet('checkSession', { token: authToken });
-    renderAuthArea();
-  } catch (err) {
-    authToken = authRole = authName = null;
-    localStorage.removeItem('sw_token'); localStorage.removeItem('sw_role'); localStorage.removeItem('sw_name');
-    renderAuthArea();
-  }
-}
-
-/* ==========================================================================
    ค้นหาข่าว — แบบง่าย กรองที่ฝั่งหน้าเว็บจากข่าวที่เผยแพร่แล้วทั้งหมด
    ========================================================================== */
 async function doSearch() {
@@ -1315,7 +1252,6 @@ async function doSearch() {
    เริ่มโหลดทุกอย่างเมื่อเปิดหน้าเว็บ
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', function () {
-  checkExistingSession();
   loadSettings();
   loadMenu();
   loadFooterMenu();
