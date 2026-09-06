@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบจัดการเว็บไซต์ | โรงเรียนตัวอย่างวิทยา</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Mitr:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2d6d;
+    --navy-dark: #111e4a;
+    --navy-light: #2a3f8f;
+    --gold: #f5a623;
+    --gold-dark: #d4891a;
+    --white: #ffffff;
+    --bg: #f4f6fb;
+    --gray-100: #eef0f6;
+    --gray-200: #dde1ee;
+    --gray-400: #a5adc4;
+    --gray-500: #8892b0;
+    --gray-700: #4a5568;
+    --text: #1e2a4a;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --shadow-sm: 0 1px 3px rgba(26,45,109,0.08);
+    --shadow-md: 0 4px 16px rgba(26,45,109,0.10);
+    --shadow-lg: 0 12px 40px rgba(17,30,74,0.22);
+    --radius: 10px;
+    --sidebar-w: 244px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+  }
+  h1, h2, h3, .brand-name { font-family: 'Mitr', sans-serif; }
+  button, input, select, textarea { font-family: 'Sarabun', sans-serif; }
+  a { color: inherit; }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 55%, var(--navy-light) 100%);
+    padding: 20px;
+  }
+  .login-card {
+    background: white; border-radius: 18px; box-shadow: var(--shadow-lg);
+    padding: 40px 36px; width: 100%; max-width: 380px;
+  }
+  .login-logo {
+    width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 18px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Mitr', sans-serif; font-size: 22px; font-weight: 700; color: var(--gold);
+  }
+  .login-card h1 { font-size: 19px; font-weight: 600; color: var(--navy); text-align: center; margin-bottom: 4px; }
+  .login-card p.sub { font-size: 13px; color: var(--gray-500); text-align: center; margin-bottom: 26px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 6px; }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 10px 13px; border: 1.5px solid var(--gray-200); border-radius: 8px;
+    font-size: 14px; color: var(--text); outline: none; transition: border-color .15s;
+    background: white;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--navy-light); }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .field .hint { font-size: 11.5px; color: var(--gray-500); margin-top: 4px; }
+  .field-checkbox { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .field-checkbox input { width: auto; }
+  .field-checkbox label { font-size: 13.5px; color: var(--text); font-weight: 500; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    border: none; cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .btn-primary { background: var(--navy); color: white; }
+  .btn-primary:hover { background: var(--navy-light); }
+  .btn-gold { background: var(--gold); color: var(--navy-dark); }
+  .btn-gold:hover { background: var(--gold-dark); }
+  .btn-outline { background: white; color: var(--navy); border: 1.5px solid var(--gray-200); }
+  .btn-outline:hover { border-color: var(--navy-light); }
+  .btn-danger { background: var(--danger-bg); color: var(--danger); }
+  .btn-danger:hover { background: #fde2e2; }
+  .btn-block { width: 100%; }
+  .btn-sm { padding: 6px 12px; font-size: 12.5px; }
+  .btn-icon { padding: 6px 9px; }
+  .error-box {
+    background: var(--danger-bg); color: var(--danger); font-size: 13px;
+    padding: 9px 12px; border-radius: 8px; margin-bottom: 14px; display: none;
+  }
+
+  /* ── APP SHELL ── */
+  #appShell { display: none; min-height: 100vh; }
+  #appShell.active { display: flex; }
+
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0; background: var(--navy-dark);
+    display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh;
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 12px; padding: 22px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-brand .icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; color: var(--gold);
+  }
+  .sidebar-brand .name { color: white; font-size: 14.5px; font-weight: 600; line-height: 1.3; }
+  .sidebar-brand .name span { display: block; font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 400; }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 14px 10px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 12px; width: 100%; text-align: right;
+    padding: 10px 14px; border-radius: 8px; border: none; background: none;
+    color: rgba(255,255,255,0.65); font-size: 14px; cursor: pointer; margin-bottom: 2px;
+    border-right: 3px solid transparent; transition: all .15s;
+  }
+  .nav-btn .ic { font-size: 16px; width: 20px; text-align: center; }
+  .nav-btn span.lbl { flex: 1; text-align: left; }
+  .nav-btn:hover { background: rgba(255,255,255,0.06); color: white; }
+  .nav-btn.active { background: rgba(245,166,35,0.12); color: white; border-right-color: var(--gold); font-weight: 600; }
+  .nav-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 10px 6px; }
+
+  .sidebar-foot { padding: 16px 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .sidebar-user .av {
+    width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; color: white;
+  }
+  .sidebar-user .info { line-height: 1.3; }
+  .sidebar-user .info strong { display: block; color: white; font-size: 13px; }
+  .sidebar-user .info span { font-size: 11px; color: rgba(255,255,255,0.45); }
+
+  .main-area { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .topbar-admin {
+    background: white; padding: 18px 32px; box-shadow: var(--shadow-sm);
+    display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 20;
+  }
+  .topbar-admin h2 { font-size: 19px; color: var(--navy); font-weight: 600; }
+  .topbar-admin .sub { font-size: 12.5px; color: var(--gray-500); margin-top: 2px; }
+  .content-area { padding: 28px 32px; flex: 1; }
+
+  .panel {
+    background: white; border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-100); overflow: hidden;
+  }
+  .panel-head {
+    padding: 18px 22px; border-bottom: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .panel-head h3 { font-size: 15.5px; color: var(--navy); font-weight: 600; }
+  .panel-body { padding: 4px 0; }
+  .panel-body.pad { padding: 22px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    text-align: right; background: var(--gray-100); color: var(--gray-700);
+    font-weight: 600; font-size: 12.5px; padding: 11px 16px; white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; }
+  tbody td { padding: 12px 16px; border-top: 1px solid var(--gray-100); vertical-align: middle; }
+  tbody td:first-child { text-align: left; }
+  tbody td { text-align: right; }
+  tbody tr:hover { background: var(--bg); }
+  .cell-main { text-align: left !important; font-weight: 500; color: var(--text); }
+  .cell-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .empty-row td { text-align: center; color: var(--gray-500); padding: 40px 16px; }
+
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+  .badge-success { background: var(--success-bg); color: var(--success); }
+  .badge-warning { background: var(--warning-bg); color: var(--warning); }
+  .badge-gray { background: var(--gray-100); color: var(--gray-700); }
+  .badge-gold { background: rgba(245,166,35,0.15); color: var(--gold-dark); }
+
+  .thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--gray-100); flex-shrink: 0; }
+  .row-flex { display: flex; align-items: center; gap: 10px; }
+
+  .stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100); }
+  .stat-card .num { font-family: 'Mitr', sans-serif; font-size: 28px; font-weight: 700; color: var(--navy); }
+  .stat-card .lbl { font-size: 13px; color: var(--gray-500); margin-top: 4px; }
+
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(17,30,74,0.55);
+    display: none; align-items: flex-start; justify-content: center;
+    z-index: 1000; padding: 40px 20px; overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: white; border-radius: 16px; max-width: 560px; width: 100%;
+    padding: 28px; position: relative; box-shadow: var(--shadow-lg);
+  }
+  .modal-box.wide { max-width: 760px; }
+  .modal-close {
+    position: absolute; top: 16px; left: 16px; background: var(--gray-100);
+    border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; color: var(--gray-700);
+  }
+  .modal-box h3 { font-size: 18px; color: var(--navy); font-weight: 600; margin-bottom: 20px; padding-left: 30px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--gray-100); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+  .form-grid .field.full { grid-column: 1 / -1; }
+
+  .media-picker-btn { font-size: 12px; color: var(--navy-light); background: none; border: none; cursor: pointer; text-decoration: underline; margin-top: 4px; }
+  .media-preview { width: 100%; max-height: 140px; object-fit: contain; border-radius: 8px; margin-top: 8px; background: var(--gray-100); display: none; }
+  .media-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap: 12px; }
+  .media-tile { border: 1.5px solid var(--gray-200); border-radius: 8px; overflow: hidden; cursor: pointer; transition: border-color .15s; background: var(--gray-100); }
+  .media-tile:hover { border-color: var(--navy-light); }
+  .media-tile img { width: 100%; height: 90px; object-fit: cover; display: block; }
+  .media-tile .fname { font-size: 10.5px; padding: 5px 6px; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .toast-wrap { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; }
+  .toast {
+    padding: 12px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: white;
+    box-shadow: var(--shadow-md); animation: toastIn .2s ease;
+  }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+  @keyframes toastIn { from { opacity:0; transform: translateY(-8px);} to {opacity:1; transform:translateY(0);} }
+
+  .breadcrumb-back { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 13.5px; color: var(--navy-light); cursor: pointer; }
+
+  @media (max-width: 900px) {
+    .sidebar { position: fixed; z-index: 200; transform: translateX(100%); transition: transform .2s; }
+    .sidebar.open { transform: translateX(0); }
+    .form-grid { grid-template-columns: 1fr; }
+    .content-area { padding: 18px; }
+    .topbar-admin { padding: 14px 18px; }
+    #mobileMenuBtn { display: inline-flex !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">ตว.</div>
+    <h1>ระบบจัดการเว็บไซต์</h1>
+    <p class="sub">โรงเรียนตัวอย่างวิทยา</p>
+    <div id="loginError" class="error-box"></div>
+    <div class="field">
+      <label>ชื่อผู้ใช้</label>
+      <input type="text" id="loginUsername" placeholder="username" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-gold btn-block" id="loginSubmitBtn">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="icon">ตว.</div>
+      <div class="name">ระบบจัดการเว็บไซต์<span>โรงเรียนตัวอย่างวิทยา</span></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav"></nav>
+    <div class="sidebar-foot">
+      <div class="sidebar-user">
+        <div class="av">👤</div>
+        <div class="info"><strong id="currentUserName">-</strong><span id="currentUserRole">-</span></div>
+      </div>
+      <button class="btn btn-outline btn-block btn-sm" id="logoutBtn" style="background:rgba(255,255,255,0.06);color:white;border-color:rgba(255,255,255,0.15)">ออกจากระบบ</button>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="topbar-admin">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-outline btn-icon" id="mobileMenuBtn" style="display:none">☰</button>
+        <div>
+          <h2 id="pageTitle">ภาพรวม</h2>
+          <div class="sub" id="pageSubtitle"></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-area" id="viewContainer"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<script>
+/* ==========================================================================
+   ⚠️ ตั้งค่า WEB_APP_URL ให้เป็น Web app URL เดียวกับที่ใช้ในหน้าเว็บสาธารณะ
+   ========================================================================== */
+const WEB_APP_URL = 'วาง_WEB_APP_URL_ของคุณตรงนี้';
+
+let authToken = localStorage.getItem('admin_token') || null;
+let authRole = localStorage.getItem('admin_role') || null;
+let authName = localStorage.getItem('admin_name') || null;
+let currentModule = null;
+let currentAlbum = null; // เก็บอัลบั้มที่กำลังดูภาพอยู่ (โมดูลแกลเลอรี)
+let mediaPickerTarget = null; // ชื่อ field ที่กำลังเลือกรูปจากคลังไฟล์ให้
+
+/* ── API helpers ── */
+async function apiGet(action, params) {
+  params = Object.assign({}, params || {});
+  const qs = new URLSearchParams(Object.assign({ action: action }, params)).toString();
+  const res = await fetch(WEB_APP_URL + '?' + qs);
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+async function apiPost(action, body) {
+  const res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action: action }, body)) });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error);
+  return json.data;
+}
+
+/* ── Utils ── */
+function escapeHtml(str) {
+  if (str === undefined || str === null) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function driveImageUrl(fileId) { return fileId ? 'https://drive.google.com/uc?export=view&id=' + fileId : ''; }
+function isTruthy(v) { return v === true || v === 'TRUE' || v === 1 || v === '1'; }
+function formatDateTime(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) + ' ' +
+    d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+}
+function showToast(msg, type) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || 'success');
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+function confirmAction(msg) { return window.confirm(msg); }
+
+/* ── Modal ── */
+function openModal(html, wide) {
+  document.getElementById('modalBox').className = 'modal-box' + (wide ? ' wide' : '');
+  document.getElementById('modalBox').innerHTML = '<button class="modal-close" onclick="closeModal()">✕</button>' + html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+document.getElementById('modalOverlay').addEventListener('click', function (e) {
+  if (e.target === this) closeModal();
+});
+
+/* ==========================================================================
+   ระบบล็อกอิน
+   ========================================================================== */
+document.getElementById('loginSubmitBtn').addEventListener('click', doLogin);
+document.getElementById('loginPassword').addEventListener('keydown', function (e) { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const username = document.getElementById('loginUsername').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errBox = document.getElementById('loginError');
+  errBox.style.display = 'none';
+  if (!username || !password) return;
+  try {
+    const result = await apiPost('login', { username: username, password: password });
+    authToken = result.token; authRole = result.role; authName = result.display_name;
+    localStorage.setItem('admin_token', authToken);
+    localStorage.setItem('admin_role', authRole);
+    localStorage.setItem('admin_name', authName);
+    enterApp();
+  } catch (err) {
+    errBox.textContent = err.message;
+    errBox.style.display = 'block';
+  }
+}
+
+async function doLogout() {
+  try { if (authToken) await apiPost('logout', { token: authToken }); } catch (e) {}
+  authToken = authRole = authName = null;
+  localStorage.removeItem('admin_token'); localStorage.removeItem('admin_role'); localStorage.removeItem('admin_name');
+  document.getElementById('appShell').classList.remove('active');
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+document.getElementById('logoutBtn').addEventListener('click', doLogout);
+
+async function checkSessionAndEnter() {
+  if (!authToken) return;
+  try {
+    await apiGet('checkSession', { token: authToken });
+    enterApp();
+  } catch (err) {
+    authToken = authRole = authName = null;
+    localStorage.removeItem('admin_token'); localStorage.removeItem('admin_role'); localStorage.removeItem('admin_name');
+  }
+}
+
+function enterApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appShell').classList.add('active');
+  document.getElementById('currentUserName').textContent = authName;
+  document.getElementById('currentUserRole').textContent = authRole === 'admin' ? 'ผู้ดูแลระบบ' : 'เอดิเตอร์';
+  buildSidebar();
+  navigateTo(NAV_ITEMS[0].key);
+}
+
+/* ==========================================================================
+   Navigation
+   ========================================================================== */
+const NAV_ITEMS = [
+  { key: 'overview', label: 'ภาพรวม', icon: '📊', render: renderOverview },
+  { key: 'settings', label: 'ตั้งค่าเว็บไซต์', icon: '⚙️', render: renderSettingsView, adminOnly: true },
+  { key: 'menu', label: 'เมนูหลัก', icon: '🧭', render: () => renderSimpleList('menu') },
+  { key: 'footermenu', label: 'เมนู Footer', icon: '🔗', render: () => renderSimpleList('footermenu') },
+  { key: 'hero', label: 'Hero หน้าแรก', icon: '🎬', render: () => renderSimpleList('hero') },
+  { key: 'stats', label: 'สถิติหน้าแรก', icon: '📈', render: () => renderSimpleList('stats') },
+  { key: 'quickaccess', label: 'ทางลัด', icon: '⚡', render: () => renderSimpleList('quickaccess') },
+  { key: 'news', label: 'ข่าวสาร', icon: '📰', render: renderNewsList },
+  { key: 'gallery', label: 'แกลเลอรี', icon: '🎞️', render: renderAlbumList },
+  { key: 'staff', label: 'บุคลากร', icon: '👥', render: () => renderSimpleList('staff') },
+  { key: 'media', label: 'คลังไฟล์', icon: '📁', render: renderMediaView },
+  { key: 'trash', label: 'ถังขยะ', icon: '🗑️', render: renderTrashView },
+  { key: 'activity', label: 'ประวัติการใช้งาน', icon: '📜', render: renderActivityView, adminOnly: true }
+];
+
+function buildSidebar() {
+  const nav = document.getElementById('sidebarNav');
+  nav.innerHTML = NAV_ITEMS
+    .filter(item => !item.adminOnly || authRole === 'admin')
+    .map(item => '<button class="nav-btn" data-key="' + item.key + '" onclick="navigateTo(\'' + item.key + '\')">' +
+      '<span class="ic">' + item.icon + '</span><span class="lbl">' + item.label + '</span></button>')
+    .join('');
+}
+
+function navigateTo(key) {
+  const item = NAV_ITEMS.find(i => i.key === key);
+  if (!item) return;
+  currentModule = key;
+  currentAlbum = null;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  document.getElementById('pageTitle').textContent = item.label;
+  document.getElementById('sidebar').classList.remove('open');
+  item.render();
+}
+
+/* ==========================================================================
+   โมดูลทั่วไปแบบ list + form (ใช้ config เดียวกันสร้างได้หลายโมดูล)
+   ========================================================================== */
+const SIMPLE_MODULES = {
+  menu: {
+    label: 'เมนูหลัก', itemName: 'เมนู',
+    listAction: 'getMainMenuAll', createAction: 'createMenuItem', updateAction: 'updateMenuItem', deleteAction: 'deleteMenuItem',
+    columns: [
+      { key: 'label', label: 'ชื่อเมนู', main: true, sub: 'id' },
+      { key: 'link_value', label: 'ลิงก์/ค่า' },
+      { key: 'parent_id', label: 'เมนูแม่' },
+      { key: 'order', label: 'ลำดับ' },
+      { key: 'is_active', label: 'สถานะ', type: 'status' }
+    ],
+    fields: [
+      { name: 'label', label: 'ชื่อเมนู', type: 'text', required: true },
+      { name: 'link_type', label: 'ประเภทลิงก์', type: 'select', options: [['internal', 'ภายในเว็บ'], ['external', 'ลิงก์ภายนอก'], ['category', 'หมวดข่าว']] },
+      { name: 'link_value', label: 'ลิงก์ หรือ ค่า', type: 'text' },
+      { name: 'parent_id', label: 'เมนูแม่ (คัดลอก id จากตาราง ถ้าต้องการให้เป็นเมนูย่อย)', type: 'text' },
+      { name: 'icon', label: 'ไอคอน (ถ้ามี)', type: 'text' },
+      { name: 'order', label: 'ลำดับการแสดง', type: 'number', default: 1 },
+      { name: 'is_active', label: 'เปิดใช้งาน', type: 'checkbox', default: true }
+    ]
+  },
+  footermenu: {
+    label: 'เมนู Footer', itemName: 'ลิงก์',
+    listAction: 'getFooterMenuAll', createAction: 'createFooterLink', updateAction: 'updateFooterLink', deleteAction: 'deleteFooterLink',
+    columns: [
+      { key: 'label', label: 'ชื่อลิงก์', main: true },
+      { key: 'group', label: 'กลุ่ม' },
+      { key: 'link', label: 'ลิงก์' },
+      { key: 'order', label: 'ลำดับ' },
+      { key: 'is_active', label: 'สถานะ', type: 'status' }
+    ],
+    fields: [
+      { name: 'label', label: 'ชื่อลิงก์', type: 'text', required: true },
+      { name: 'group', label: 'กลุ่ม', type: 'select', options: [['ลิงก์ด่วน', 'ลิงก์ด่วน'], ['สำหรับผู้ปกครอง', 'สำหรับผู้ปกครอง']] },
+      { name: 'link', label: 'ลิงก์', type: 'text' },
+      { name: 'order', label: 'ลำดับการแสดง', type: 'number', default: 1 },
+      { name: 'is_active', label: 'เปิดใช้งาน', type: 'checkbox', default: true }
+    ]
+  },
+  hero: {
+    label: 'Hero หน้าแรก', itemName: 'สไลด์',
+    listAction: 'getHeroSlidesAll', createAction: 'createHeroSlide', updateAction: 'updateHeroSlide', deleteAction: 'deleteHeroSlide',
+    columns: [
+      { key: 'heading', label: 'หัวข้อ', main: true, sub: 'subtitle' },
+      { key: 'order', label: 'ลำดับ' },
+      { key: 'is_active', label: 'สถานะ', type: 'status' }
+    ],
+    fields: [
+      { name: 'badge_text', label: 'ข้อความ badge', type: 'text' },
+      { name: 'heading', label: 'หัวข้อหลัก', type: 'textarea', required: true },
+      { name: 'subtitle', label: 'คำโปรย', type: 'text' },
+      { name: 'cta1_text', label: 'ปุ่ม 1 - ข้อความ', type: 'text' },
+      { name: 'cta1_link', label: 'ปุ่ม 1 - ลิงก์', type: 'text' },
+      { name: 'cta2_text', label: 'ปุ่ม 2 - ข้อความ', type: 'text' },
+      { name: 'cta2_link', label: 'ปุ่ม 2 - ลิงก์', type: 'text' },
+      { name: 'image_drive_id', label: 'รูปพื้นหลัง', type: 'media', category: 'Hero_Banners' },
+      { name: 'order', label: 'ลำดับการแสดง', type: 'number', default: 1 },
+      { name: 'is_active', label: 'เปิดใช้งาน', type: 'checkbox', default: true },
+      { name: 'start_date', label: 'แสดงตั้งแต่วันที่ (เว้นว่าง = แสดงทันที)', type: 'date' },
+      { name: 'end_date', label: 'แสดงถึงวันที่ (เว้นว่าง = ไม่มีกำหนด)', type: 'date' }
+    ]
+  },
+  stats: {
+    label: 'สถิติหน้าแรก', itemName: 'รายการสถิติ',
+    listAction: 'getStatsAll', createAction: 'createStat', updateAction: 'updateStat', deleteAction: 'deleteStat',
+    columns: [
+      { key: 'label', label: 'ป้ายชื่อ', main: true },
+      { key: 'number', label: 'ตัวเลข' },
+      { key: 'icon', label: 'ไอคอน' },
+      { key: 'order', label: 'ลำดับ' },
+      { key: 'is_active', label: 'สถานะ', type: 'status' }
+    ],
+    fields: [
+      { name: 'icon', label: 'ไอคอน (emoji)', type: 'text', required: true },
+      { name: 'number', label: 'ตัวเลข (พิมพ์เป็นข้อความได้ เช่น 2,500+)', type: 'text', required: true },
+      { name: 'label', label: 'ป้ายชื่อ', type: 'text', required: true },
+      { name: 'order', label: 'ลำดับการแสดง', type: 'number', default: 1 },
+      { name: 'is_active', label: 'เปิดใช้งาน', type: 'checkbox', default: true }
+    ]
+  },
+  quickaccess: {
+    label: 'ทางลัด', itemName: 'ทางลัด',
+    listAction: 'getQuickAccessAll', createAction: 'createQuickAccess', updateAction: 'updateQuickAccess', deleteAction: 'deleteQuickAccess',
+    columns: [
+      { key: 'label', label: 'ชื่อ', main: true },
+      { key: 'link_value', label: 'ลิงก์' },
+      { key: 'icon', label: 'ไอคอน' },
+      { key: 'order', label: 'ลำดับ' },
+      { key: 'is_active', label: 'สถานะ', type: 'status' }
+    ],
+    fields: [
+      { name: 'icon', label: 'ไอคอน (emoji)', type: 'text', required: true },
+      { name: 'label', label: 'ชื่อ', type: 'text', required: true },
+      { name: 'link_type', label: 'ประเภทลิงก์', type: 'select', options: [['internal', 'ภายในเว็บ'], ['external', 'ลิงก์ภายนอก']] },
+      { name: 'link_value', label: 'ลิงก์', type: 'text' },
+      { name: 'order', label: 'ลำดับการแสดง', type: 'number', default: 1 },
+      { name: 'is_active', label: 'เปิดใช้งาน', type: 'checkbox', default: true }
+    ]
+  },
+  staff: {
+    label: 'บุคลากร', itemName: 'บุคลากร',
+    listAction: 'getStaffAll', createAction: 'createStaff', updateAction: 'updateStaff', deleteAction: 'deleteStaff',
+    columns: [
+      { key: 'name', label: 'ชื่อ-สกุล', main: true, sub: 'position', img: 'photo_drive_id' },
+      { key: 'department', label: 'ฝ่าย/กลุ่มสาระ' },
+      { key: 'order', label: 'ลำดับ' },
+      { key: 'is_active', label: 'สถานะ', type: 'status' }
+    ],
+    fields: [
+      { name: 'name', label: 'ชื่อ-สกุล', type: 'text', required: true },
+      { name: 'position', label: 'ตำแหน่ง', type: 'text', required: true },
+      { name: 'department', label: 'ฝ่าย/กลุ่มสาระ', type: 'text' },
+      { name: 'photo_drive_id', label: 'รูปภาพ', type: 'media', category: 'Staff_Photos' },
+      { name: 'phone', label: 'เบอร์โทร', type: 'text' },
+      { name: 'email', label: 'อีเมล', type: 'text' },
+      { name: 'order', label: 'ลำดับการแสดง', type: 'number', default: 1 },
+      { name: 'is_active', label: 'เปิดใช้งาน', type: 'checkbox', default: true }
+    ]
+  }
+};
+
+async function renderSimpleList(key) {
+  const cfg = SIMPLE_MODULES[key];
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = simplePanelSkeleton(cfg);
+  try {
+    const items = await apiGet(cfg.listAction, { token: authToken });
+    items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+    renderSimpleTable(key, items);
+  } catch (err) {
+    document.getElementById('tblBody-' + key).innerHTML = '<tr class="empty-row"><td colspan="8">โหลดข้อมูลไม่สำเร็จ: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+function simplePanelSkeleton(cfg) {
+  const heads = cfg.columns.map(c => '<th>' + c.label + '</th>').join('') + '<th>จัดการ</th>';
+  return '<div class="panel">' +
+    '<div class="panel-head"><h3>รายการทั้งหมด</h3>' +
+    '<button class="btn btn-gold btn-sm" onclick="openSimpleForm(\'' + currentModule + '\')">+ เพิ่ม' + cfg.itemName + '</button></div>' +
+    '<div class="panel-body"><table><thead><tr>' + heads + '</tr></thead><tbody id="tblBody-' + currentModule + '">' +
+    '<tr class="empty-row"><td colspan="8">กำลังโหลด...</td></tr></tbody></table></div></div>';
+}
+
+function renderSimpleTable(key, items) {
+  const cfg = SIMPLE_MODULES[key];
+  const tbody = document.getElementById('tblBody-' + key);
+  if (!items.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">ยังไม่มีข้อมูล — กด "+ เพิ่ม' + cfg.itemName + '" เพื่อเริ่มเพิ่มรายการแรก</td></tr>';
+    return;
+  }
+  tbody.innerHTML = items.map(item => {
+    const cells = cfg.columns.map(col => {
+      if (col.main) {
+        const img = col.img && item[col.img] ? '<img class="thumb" src="' + driveImageUrl(item[col.img]) + '">' : '';
+        return '<td class="cell-main"><div class="row-flex">' + img + '<div><div>' + escapeHtml(item[col.key]) + '</div>' +
+          (col.sub ? '<div class="cell-sub">' + escapeHtml(item[col.sub] || (col.sub === 'id' ? item.id : '')) + '</div>' : '') +
+          '</div></div></td>';
+      }
+      if (col.type === 'status') {
+        return '<td>' + (isTruthy(item.is_active) ? '<span class="badge badge-success">เปิดใช้งาน</span>' : '<span class="badge badge-gray">ปิดอยู่</span>') + '</td>';
+      }
+      return '<td>' + escapeHtml(item[col.key]) + '</td>';
+    }).join('');
+    return '<tr>' + cells +
+      '<td><div class="row-actions">' +
+      '<button class="btn btn-outline btn-sm btn-icon" onclick="openSimpleForm(\'' + key + '\',' + "'" + item.id + "'" + ')" title="แก้ไข">✏️</button>' +
+      '<button class="btn btn-danger btn-sm btn-icon" onclick="deleteSimpleItem(\'' + key + '\',' + "'" + item.id + "'" + ')" title="ลบ">🗑️</button>' +
+      '</div></td></tr>';
+  }).join('');
+  window['__data_' + key] = items;
+}
+
+function buildFieldHtml(f, value) {
+  const val = value === undefined || value === null ? (f.default !== undefined ? f.default : '') : value;
+  if (f.type === 'checkbox') {
+    return '<div class="field-checkbox"><input type="checkbox" id="f_' + f.name + '" ' + (isTruthy(val) ? 'checked' : '') + '>' +
+      '<label for="f_' + f.name + '">' + f.label + '</label></div>';
+  }
+  let inner = '';
+  if (f.type === 'textarea') {
+    inner = '<textarea id="f_' + f.name + '">' + escapeHtml(val) + '</textarea>';
+  } else if (f.type === 'select') {
+    inner = '<select id="f_' + f.name + '">' + f.options.map(o => '<option value="' + o[0] + '"' + (o[0] === val ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
+  } else if (f.type === 'media') {
+    const previewSrc = val ? driveImageUrl(val) : '';
+    inner = '<input type="hidden" id="f_' + f.name + '" value="' + escapeHtml(val) + '">' +
+      '<button type="button" class="media-picker-btn" onclick="openMediaPicker(\'' + f.name + '\',\'' + (f.category || '') + '\')">📁 เลือกจากคลังไฟล์ / อัปโหลดใหม่</button>' +
+      '<img class="media-preview" id="preview_' + f.name + '" src="' + previewSrc + '" style="' + (val ? 'display:block' : '') + '">';
+  } else {
+    inner = '<input type="' + (f.type || 'text') + '" id="f_' + f.name + '" value="' + escapeHtml(val) + '">';
+  }
+  const cls = f.type === 'textarea' || f.type === 'media' ? ' full' : '';
+  return '<div class="field' + cls + '"><label>' + f.label + '</label>' + inner + '</div>';
+}
+
+function readFieldValue(f) {
+  if (f.type === 'checkbox') return document.getElementById('f_' + f.name).checked;
+  if (f.type === 'number') return document.getElementById('f_' + f.name).value;
+  return document.getElementById('f_' + f.name).value.trim();
+}
+
+function openSimpleForm(key, id) {
+  const cfg = SIMPLE_MODULES[key];
+  const items = window['__data_' + key] || [];
+  const existing = id ? items.find(i => String(i.id) === String(id)) : null;
+  const fieldsHtml = cfg.fields.map(f => buildFieldHtml(f, existing ? existing[f.name] : undefined)).join('');
+  openModal(
+    '<h3>' + (existing ? 'แก้ไข' : 'เพิ่ม') + cfg.itemName + '</h3>' +
+    '<div id="formError" class="error-box"></div>' +
+    '<div class="form-grid">' + fieldsHtml + '</div>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>' +
+    '<button class="btn btn-gold" onclick="submitSimpleForm(\'' + key + '\',' + (existing ? "'" + existing.id + "'" : 'null') + ')">บันทึก</button></div>'
+  );
+}
+
+async function submitSimpleForm(key, id) {
+  const cfg = SIMPLE_MODULES[key];
+  const data = {};
+  for (const f of cfg.fields) {
+    const v = readFieldValue(f);
+    if (f.required && !v) {
+      document.getElementById('formError').textContent = 'กรุณากรอก "' + f.label + '"';
+      document.getElementById('formError').style.display = 'block';
+      return;
+    }
+    data[f.name] = v;
+  }
+  try {
+    if (id) {
+      await apiPost(cfg.updateAction, { token: authToken, id: id, updates: data });
+      showToast('บันทึกการแก้ไขแล้ว');
+    } else {
+      await apiPost(cfg.createAction, { token: authToken, data: data });
+      showToast('เพิ่ม' + cfg.itemName + 'แล้ว');
+    }
+    closeModal();
+    renderSimpleList(key);
+  } catch (err) {
+    document.getElementById('formError').textContent = err.message;
+    document.getElementById('formError').style.display = 'block';
+  }
+}
+
+async function deleteSimpleItem(key, id) {
+  const cfg = SIMPLE_MODULES[key];
+  if (!confirmAction('ย้าย' + cfg.itemName + 'นี้ไปถังขยะ?')) return;
+  try {
+    await apiPost(cfg.deleteAction, { token: authToken, id: id });
+    showToast('ย้ายไปถังขยะแล้ว');
+    renderSimpleList(key);
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+/* ==========================================================================
+   ข่าวสาร
+   ========================================================================== */
+const NEWS_CATEGORIES = ['ประชาสัมพันธ์', 'ข่าวกิจกรรม', 'จัดซื้อจ้าง', 'รับสมัครงาน', 'ผลงานนักเรียน'];
+
+async function renderNewsList() {
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="panel"><div class="panel-head"><h3>ข่าวทั้งหมด</h3>' +
+    '<button class="btn btn-gold btn-sm" onclick="openNewsForm()">+ เพิ่มข่าว</button></div>' +
+    '<div class="panel-body"><table><thead><tr><th>หัวข้อข่าว</th><th>วันที่เผยแพร่</th><th>ยอดเข้าชม</th><th>สถานะ</th><th>จัดการ</th></tr></thead>' +
+    '<tbody id="tblBody-news"><tr class="empty-row"><td colspan="5">กำลังโหลด...</td></tr></tbody></table></div></div>';
+  try {
+    const items = await apiGet('getNewsAll', { token: authToken });
+    items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    window.__data_news = items;
+    const tbody = document.getElementById('tblBody-news');
+    if (!items.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">ยังไม่มีข่าว — กด "+ เพิ่มข่าว" เพื่อเริ่มเพิ่มข่าวแรก</td></tr>'; return; }
+    tbody.innerHTML = items.map(n => {
+      const statusBadges = (isTruthy(n.is_pinned) ? '<span class="badge badge-gold">📌 ปักหมุด</span> ' : '') +
+        (isTruthy(n.is_published) ? '<span class="badge badge-success">เผยแพร่แล้ว</span>' : '<span class="badge badge-gray">แบบร่าง</span>');
+      return '<tr><td class="cell-main"><div class="row-flex">' +
+        (n.image_drive_id ? '<img class="thumb" src="' + driveImageUrl(n.image_drive_id) + '">' : '') +
+        '<div><div>' + escapeHtml(n.title) + '</div><div class="cell-sub">' + escapeHtml(n.category) + '</div></div></div></td>' +
+        '<td>' + formatDateTime(n.published_date) + '</td>' +
+        '<td>' + (n.views || 0) + '</td>' +
+        '<td>' + statusBadges + '</td>' +
+        '<td><div class="row-actions">' +
+        '<button class="btn btn-outline btn-sm btn-icon" onclick="togglePinNews(\'' + n.id + '\')" title="ปักหมุด">📌</button>' +
+        '<button class="btn btn-outline btn-sm btn-icon" onclick="openNewsForm(\'' + n.id + '\')" title="แก้ไข">✏️</button>' +
+        '<button class="btn btn-danger btn-sm btn-icon" onclick="deleteNewsItem(\'' + n.id + '\')" title="ลบ">🗑️</button>' +
+        '</div></td></tr>';
+    }).join('');
+  } catch (err) {
+    document.getElementById('tblBody-news').innerHTML = '<tr class="empty-row"><td colspan="5">โหลดข้อมูลไม่สำเร็จ: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+function openNewsForm(id) {
+  const existing = id ? (window.__data_news || []).find(n => String(n.id) === String(id)) : null;
+  const catOptions = NEWS_CATEGORIES.map(c => '<option value="' + c + '"' + (existing && existing.category === c ? ' selected' : '') + '>' + c + '</option>').join('');
+  openModal(
+    '<h3>' + (existing ? 'แก้ไขข่าว' : 'เพิ่มข่าวใหม่') + '</h3>' +
+    '<div id="formError" class="error-box"></div>' +
+    '<div class="form-grid">' +
+    '<div class="field"><label>หมวดหมู่</label><select id="f_category">' + catOptions + '</select></div>' +
+    '<div class="field"><label>วันที่เผยแพร่ (เว้นว่าง = วันนี้)</label><input type="date" id="f_published_date" value="' + (existing && existing.published_date ? String(existing.published_date).slice(0, 10) : '') + '"></div>' +
+    '<div class="field full"><label>หัวข้อข่าว</label><input type="text" id="f_title" value="' + escapeHtml(existing ? existing.title : '') + '"></div>' +
+    '<div class="field full"><label>เกริ่นนำ / สรุปย่อ (แสดงในการ์ดข่าว)</label><textarea id="f_excerpt">' + escapeHtml(existing ? existing.excerpt : '') + '</textarea></div>' +
+    '<div class="field full"><label>เนื้อหาข่าวแบบเต็ม</label><textarea id="f_content_html" style="min-height:140px">' + escapeHtml(existing ? existing.content_html : '') + '</textarea>' +
+    '<div class="hint">ใส่ข้อความปกติได้เลย หรือใช้แท็ก HTML พื้นฐานเช่น &lt;br&gt; &lt;b&gt; ถ้าต้องการจัดรูปแบบ</div></div>' +
+    '<div class="field full"><label>รูปข่าว</label>' +
+    '<input type="hidden" id="f_image_drive_id" value="' + escapeHtml(existing ? existing.image_drive_id : '') + '">' +
+    '<button type="button" class="media-picker-btn" onclick="openMediaPicker(\'image_drive_id\',\'News_Images\')">📁 เลือกจากคลังไฟล์ / อัปโหลดใหม่</button>' +
+    '<img class="media-preview" id="preview_image_drive_id" src="' + driveImageUrl(existing ? existing.image_drive_id : '') + '" style="' + (existing && existing.image_drive_id ? 'display:block' : '') + '"></div>' +
+    '<div class="field-checkbox full"><input type="checkbox" id="f_is_published" ' + (existing ? (isTruthy(existing.is_published) ? 'checked' : '') : 'checked') + '><label for="f_is_published">เผยแพร่ทันที (ถ้าไม่ติ๊ก จะบันทึกเป็นแบบร่าง)</label></div>' +
+    '</div>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>' +
+    '<button class="btn btn-gold" onclick="submitNewsForm(' + (existing ? "'" + existing.id + "'" : 'null') + ')">บันทึก</button></div>',
+    true
+  );
+}
+
+async function submitNewsForm(id) {
+  const title = document.getElementById('f_title').value.trim();
+  const category = document.getElementById('f_category').value;
+  if (!title) { document.getElementById('formError').textContent = 'กรุณากรอกหัวข้อข่าว'; document.getElementById('formError').style.display = 'block'; return; }
+  const data = {
+    category: category,
+    title: title,
+    excerpt: document.getElementById('f_excerpt').value.trim(),
+    content_html: document.getElementById('f_content_html').value.trim(),
+    image_drive_id: document.getElementById('f_image_drive_id').value,
+    is_published: document.getElementById('f_is_published').checked
+  };
+  const pubDate = document.getElementById('f_published_date').value;
+  if (pubDate) data.published_date = new Date(pubDate).toISOString();
+  try {
+    if (id) { await apiPost('updateNews', { token: authToken, id: id, updates: data }); showToast('บันทึกการแก้ไขแล้ว'); }
+    else { await apiPost('createNews', { token: authToken, data: data }); showToast('เพิ่มข่าวแล้ว'); }
+    closeModal();
+    renderNewsList();
+  } catch (err) {
+    document.getElementById('formError').textContent = err.message;
+    document.getElementById('formError').style.display = 'block';
+  }
+}
+
+async function togglePinNews(id) {
+  try { await apiPost('setPinnedNews', { token: authToken, id: id }); showToast('ปักหมุดข่าวนี้แล้ว (ยกเลิกปักหมุดข่าวเก่าให้อัตโนมัติ)'); renderNewsList(); }
+  catch (err) { showToast(err.message, 'error'); }
+}
+async function deleteNewsItem(id) {
+  if (!confirmAction('ย้ายข่าวนี้ไปถังขยะ?')) return;
+  try { await apiPost('deleteNews', { token: authToken, id: id }); showToast('ย้ายไปถังขยะแล้ว'); renderNewsList(); }
+  catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ==========================================================================
+   แกลเลอรี — อัลบั้ม + ภาพในอัลบั้ม
+   ========================================================================== */
+async function renderAlbumList() {
+  currentAlbum = null;
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="panel"><div class="panel-head"><h3>อัลบั้มทั้งหมด</h3>' +
+    '<button class="btn btn-gold btn-sm" onclick="openAlbumForm()">+ เพิ่มอัลบั้ม</button></div>' +
+    '<div class="panel-body"><table><thead><tr><th>ชื่ออัลบั้ม</th><th>วันที่กิจกรรม</th><th>ลำดับ</th><th>สถานะ</th><th>จัดการ</th></tr></thead>' +
+    '<tbody id="tblBody-albums"><tr class="empty-row"><td colspan="5">กำลังโหลด...</td></tr></tbody></table></div></div>';
+  try {
+    const items = await apiGet('getAlbumsAll', { token: authToken });
+    items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+    window.__data_albums = items;
+    const tbody = document.getElementById('tblBody-albums');
+    if (!items.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="5">ยังไม่มีอัลบั้ม — กด "+ เพิ่มอัลบั้ม" เพื่อเริ่มเพิ่มอัลบั้มแรก</td></tr>'; return; }
+    tbody.innerHTML = items.map(a => {
+      return '<tr><td class="cell-main"><div class="row-flex">' +
+        (a.cover_image_drive_id ? '<img class="thumb" src="' + driveImageUrl(a.cover_image_drive_id) + '">' : '') +
+        '<div>' + escapeHtml(a.title) + '</div></div></td>' +
+        '<td>' + escapeHtml(a.event_date) + '</td><td>' + escapeHtml(a.order) + '</td>' +
+        '<td>' + (isTruthy(a.is_active) ? '<span class="badge badge-success">เปิดใช้งาน</span>' : '<span class="badge badge-gray">ปิดอยู่</span>') + '</td>' +
+        '<td><div class="row-actions">' +
+        '<button class="btn btn-outline btn-sm" onclick="viewAlbumPhotos(\'' + a.id + '\',\'' + escapeHtml(a.title).replace(/'/g, "\\'") + '\')">🖼️ ดูภาพ</button>' +
+        '<button class="btn btn-outline btn-sm btn-icon" onclick="openAlbumForm(\'' + a.id + '\')" title="แก้ไข">✏️</button>' +
+        '<button class="btn btn-danger btn-sm btn-icon" onclick="deleteAlbumItem(\'' + a.id + '\')" title="ลบ">🗑️</button>' +
+        '</div></td></tr>';
+    }).join('');
+  } catch (err) {
+    document.getElementById('tblBody-albums').innerHTML = '<tr class="empty-row"><td colspan="5">โหลดข้อมูลไม่สำเร็จ: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+function openAlbumForm(id) {
+  const existing = id ? (window.__data_albums || []).find(a => String(a.id) === String(id)) : null;
+  openModal(
+    '<h3>' + (existing ? 'แก้ไขอัลบั้ม' : 'เพิ่มอัลบั้มใหม่') + '</h3>' +
+    '<div id="formError" class="error-box"></div>' +
+    '<div class="form-grid">' +
+    '<div class="field full"><label>ชื่ออัลบั้ม</label><input type="text" id="f_title" value="' + escapeHtml(existing ? existing.title : '') + '"></div>' +
+    '<div class="field full"><label>คำอธิบาย</label><textarea id="f_description">' + escapeHtml(existing ? existing.description : '') + '</textarea></div>' +
+    '<div class="field"><label>วันที่กิจกรรม</label><input type="date" id="f_event_date" value="' + escapeHtml(existing ? existing.event_date : '') + '"></div>' +
+    '<div class="field"><label>ลำดับการแสดง</label><input type="number" id="f_order" value="' + (existing ? existing.order : 1) + '"></div>' +
+    '<div class="field full"><label>ภาพปกอัลบั้ม</label>' +
+    '<input type="hidden" id="f_cover_image_drive_id" value="' + escapeHtml(existing ? existing.cover_image_drive_id : '') + '">' +
+    '<button type="button" class="media-picker-btn" onclick="openMediaPicker(\'cover_image_drive_id\',\'Gallery\')">📁 เลือกจากคลังไฟล์ / อัปโหลดใหม่</button>' +
+    '<img class="media-preview" id="preview_cover_image_drive_id" src="' + driveImageUrl(existing ? existing.cover_image_drive_id : '') + '" style="' + (existing && existing.cover_image_drive_id ? 'display:block' : '') + '"></div>' +
+    '<div class="field-checkbox full"><input type="checkbox" id="f_is_active" ' + (existing ? (isTruthy(existing.is_active) ? 'checked' : '') : 'checked') + '><label for="f_is_active">เปิดใช้งาน</label></div>' +
+    '</div>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>' +
+    '<button class="btn btn-gold" onclick="submitAlbumForm(' + (existing ? "'" + existing.id + "'" : 'null') + ')">บันทึก</button></div>'
+  );
+}
+
+async function submitAlbumForm(id) {
+  const title = document.getElementById('f_title').value.trim();
+  if (!title) { document.getElementById('formError').textContent = 'กรุณากรอกชื่ออัลบั้ม'; document.getElementById('formError').style.display = 'block'; return; }
+  const data = {
+    title: title,
+    description: document.getElementById('f_description').value.trim(),
+    event_date: document.getElementById('f_event_date').value,
+    order: document.getElementById('f_order').value,
+    cover_image_drive_id: document.getElementById('f_cover_image_drive_id').value,
+    is_active: document.getElementById('f_is_active').checked
+  };
+  try {
+    if (id) { await apiPost('updateAlbum', { token: authToken, id: id, updates: data }); showToast('บันทึกการแก้ไขแล้ว'); }
+    else { await apiPost('createAlbum', { token: authToken, data: data }); showToast('เพิ่มอัลบั้มแล้ว'); }
+    closeModal();
+    renderAlbumList();
+  } catch (err) {
+    document.getElementById('formError').textContent = err.message;
+    document.getElementById('formError').style.display = 'block';
+  }
+}
+
+async function deleteAlbumItem(id) {
+  if (!confirmAction('ย้ายอัลบั้มนี้ (พร้อมภาพทั้งหมดในอัลบั้ม) ไปถังขยะ?')) return;
+  try {
+    const result = await apiPost('deleteAlbum', { token: authToken, id: id });
+    showToast('ย้ายไปถังขยะแล้ว (ภาพ ' + result.photosDeleted + ' รูป)');
+    renderAlbumList();
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+async function viewAlbumPhotos(albumId, albumTitle) {
+  currentAlbum = albumId;
+  const container = document.getElementById('viewContainer');
+  container.innerHTML =
+    '<div class="breadcrumb-back" onclick="renderAlbumList()">← กลับไปรายการอัลบั้ม</div>' +
+    '<div class="panel"><div class="panel-head"><h3>ภาพในอัลบั้ม: ' + escapeHtml(albumTitle) + '</h3>' +
+    '<button class="btn btn-gold btn-sm" onclick="openPhotoForm(\'' + albumId + '\')">+ เพิ่มภาพ</button></div>' +
+    '<div class="panel-body pad"><div class="media-grid" id="photoGrid">กำลังโหลด...</div></div></div>';
+  try {
+    const album = await apiGet('getAlbumWithPhotos', { albumId: albumId });
+    window.__data_photos = album.photos;
+    const grid = document.getElementById('photoGrid');
+    if (!album.photos.length) { grid.innerHTML = '<p style="color:var(--gray-500);grid-column:1/-1">ยังไม่มีภาพในอัลบั้มนี้</p>'; return; }
+    grid.innerHTML = album.photos.map(p =>
+      '<div class="media-tile" style="position:relative">' +
+      '<img src="' + driveImageUrl(p.image_drive_id) + '">' +
+      '<div class="fname">' + escapeHtml(p.caption || '(ไม่มีคำบรรยาย)') + '</div>' +
+      '<div style="display:flex;gap:4px;padding:0 6px 6px">' +
+      '<button class="btn btn-outline btn-sm btn-icon" style="flex:1" onclick="openPhotoForm(\'' + albumId + '\',\'' + p.id + '\')">✏️</button>' +
+      '<button class="btn btn-danger btn-sm btn-icon" style="flex:1" onclick="deletePhotoItem(\'' + p.id + '\',\'' + albumId + '\',\'' + escapeHtml(albumTitle).replace(/'/g, "\\'") + '\')">🗑️</button>' +
+      '</div></div>'
+    ).join('');
+  } catch (err) {
+    document.getElementById('photoGrid').innerHTML = 'โหลดไม่สำเร็จ: ' + escapeHtml(err.message);
+  }
+}
+
+function openPhotoForm(albumId, photoId) {
+  const existing = photoId ? (window.__data_photos || []).find(p => String(p.id) === String(photoId)) : null;
+  openModal(
+    '<h3>' + (existing ? 'แก้ไขภาพ' : 'เพิ่มภาพใหม่') + '</h3>' +
+    '<div id="formError" class="error-box"></div>' +
+    '<div class="field full"><label>รูปภาพ</label>' +
+    '<input type="hidden" id="f_image_drive_id" value="' + escapeHtml(existing ? existing.image_drive_id : '') + '">' +
+    '<button type="button" class="media-picker-btn" onclick="openMediaPicker(\'image_drive_id\',\'Gallery\')">📁 เลือกจากคลังไฟล์ / อัปโหลดใหม่</button>' +
+    '<img class="media-preview" id="preview_image_drive_id" src="' + driveImageUrl(existing ? existing.image_drive_id : '') + '" style="' + (existing && existing.image_drive_id ? 'display:block' : '') + '"></div>' +
+    '<div class="field"><label>คำบรรยายภาพ</label><input type="text" id="f_caption" value="' + escapeHtml(existing ? existing.caption : '') + '"></div>' +
+    '<div class="field"><label>ลำดับการแสดง</label><input type="number" id="f_order" value="' + (existing ? existing.order : 1) + '"></div>' +
+    '<div class="modal-actions"><button class="btn btn-outline" onclick="closeModal()">ยกเลิก</button>' +
+    '<button class="btn btn-gold" onclick="submitPhotoForm(\'' + albumId + '\',' + (existing ? "'" + existing.id + "'" : 'null') + ')">บันทึก</button></div>'
+  );
+}
+
+async function submitPhotoForm(albumId, photoId) {
+  const imageId = document.getElementById('f_image_drive_id').value;
+  if (!imageId) { document.getElementById('formError').textContent = 'กรุณาเลือกรูปภาพ'; document.getElementById('formError').style.display = 'block'; return; }
+  const data = {
+    image_drive_id: imageId,
+    caption: document.getElementById('f_caption').value.trim(),
+    order: document.getElementById('f_order').value
+  };
+  try {
+    if (photoId) { await apiPost('updatePhoto', { token: authToken, id: photoId, updates: data }); showToast('บันทึกการแก้ไขแล้ว'); }
+    else { await apiPost('addPhoto', { token: authToken, albumId: albumId, data: data }); showToast('เพิ่มภาพแล้ว'); }
+    closeModal();
+    const album = (window.__data_albums || []).find(a => String(a.id) === String(albumId));
+    viewAlbumPhotos(albumId, album ? album.title : '');
+  } catch (err) {
+    document.getElementById('formError').textContent = err.message;
+    document.getElementById('formError').style.display = 'block';
+  }
+}
+
+async function deletePhotoItem(photoId, albumId, albumTitle) {
+  if (!confirmAction('ย้ายภาพนี้ไปถังขยะ?')) return;
+  try {
+    await apiPost('deletePhoto', { token: authToken, id: photoId });
+    showToast('ย้ายไปถังขยะแล้ว');
+    viewAlbumPhotos(albumId, albumTitle);
+  } catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ==========================================================================
+   Media picker — เลือกไฟล์ที่มีอยู่แล้ว หรืออัปโหลดใหม่ แล้วเติมค่ากลับให้ field ที่เรียกมา
+   ========================================================================== */
+function openMediaPicker(fieldName, category) {
+  mediaPickerTarget = fieldName;
+  openModal(
+    '<h3>เลือกรูปภาพ</h3>' +
+    '<div id="formError" class="error-box"></div>' +
+    '<div class="field"><label>อัปโหลดไฟล์ใหม่</label><input type="file" id="pickerFileInput" accept="image/*"></div>' +
+    '<button class="btn btn-primary btn-sm" style="margin-bottom:18px" onclick="uploadAndSelect(\'' + category + '\')">⬆️ อัปโหลดและใช้รูปนี้</button>' +
+    '<div class="field"><label>หรือเลือกจากไฟล์ที่เคยอัปโหลดไว้ (หมวด: ' + category + ')</label></div>' +
+    '<div class="media-grid" id="pickerGrid">กำลังโหลด...</div>',
+    true
+  );
+  apiGet('getMediaList', { token: authToken, category: category }).then(items => {
+    const grid = document.getElementById('pickerGrid');
+    if (!items.length) { grid.innerHTML = '<p style="color:var(--gray-500)">ยังไม่มีไฟล์ในหมวดนี้</p>'; return; }
+    grid.innerHTML = items.map(m =>
+      '<div class="media-tile" onclick="selectMedia(\'' + m.drive_file_id + '\')"><img src="' + driveImageUrl(m.drive_file_id) + '"><div class="fname">' + escapeHtml(m.filename) + '</div></div>'
+    ).join('');
+  }).catch(err => { document.getElementById('pickerGrid').innerHTML = 'โหลดไม่สำเร็จ: ' + escapeHtml(err.message); });
+}
+
+function selectMedia(driveFileId) {
+  const field = document.getElementById('f_' + mediaPickerTarget);
+  const preview = document.getElementById('preview_' + mediaPickerTarget);
+  if (field) field.value = driveFileId;
+  if (preview) { preview.src = driveImageUrl(driveFileId); preview.style.display = 'block'; }
+  closeModal();
+}
+
+function uploadAndSelect(category) {
+  const fileInput = document.getElementById('pickerFileInput');
+  const file = fileInput.files[0];
+  if (!file) { document.getElementById('formError').textContent = 'กรุณาเลือกไฟล์ก่อน'; document.getElementById('formError').style.display = 'block'; return; }
+  const reader = new FileReader();
+  reader.onload = async function () {
+    const base64 = reader.result.split(',')[1];
+    try {
+      const media = await apiPost('uploadFile', { token: authToken, data: { base64: base64, filename: file.name, mimeType: file.type, category: category } });
+      showToast('อัปโหลดสำเร็จ');
+      selectMedia(media.drive_file_id);
+    } catch (err) {
+      document.getElementById('formError').textContent = err.message;
+      document.getElementById('formError').style.display = 'block';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ==========================================================================
+   ภาพรวม (Dashboard home)
+   ========================================================================== */
+async function renderOverview() {
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="stat-cards" id="overviewStats">' +
+    ['ข่าวสาร', 'อัลบั้มภาพ', 'บุคลากร', 'รายการในถังขยะ'].map(l => '<div class="stat-card"><div class="num">…</div><div class="lbl">' + l + '</div></div>').join('') +
+    '</div><div class="panel panel-body pad"><p style="color:var(--gray-700);line-height:1.8">ยินดีต้อนรับเข้าสู่ระบบจัดการเว็บไซต์ เลือกเมนูด้านซ้ายเพื่อจัดการเนื้อหาแต่ละส่วนของเว็บไซต์โรงเรียนได้เลยครับ</p></div>';
+  const results = await Promise.allSettled([
+    apiGet('getNewsAll', { token: authToken }),
+    apiGet('getAlbumsAll', { token: authToken }),
+    apiGet('getStaffAll', { token: authToken }),
+    apiGet('getTrash', { token: authToken })
+  ]);
+  const nums = results.map(r => r.status === 'fulfilled' ? r.value.length : '-');
+  const cards = document.querySelectorAll('#overviewStats .stat-card .num');
+  cards.forEach((c, i) => { c.textContent = nums[i]; });
+}
+
+/* ==========================================================================
+   ตั้งค่าเว็บไซต์ (Settings)
+   ========================================================================== */
+const SETTINGS_FIELDS = [
+  { name: 'school_name_th', label: 'ชื่อโรงเรียน' },
+  { name: 'tagline', label: 'คำขวัญ / สโลแกน' },
+  { name: 'logo_drive_id', label: 'โลโก้โรงเรียน', type: 'media', category: 'Logo' },
+  { name: 'address', label: 'ที่อยู่', type: 'textarea' },
+  { name: 'phone', label: 'เบอร์โทรศัพท์' },
+  { name: 'email', label: 'อีเมล' },
+  { name: 'office_hours', label: 'เวลาทำการ' },
+  { name: 'fb_url', label: 'ลิงก์ Facebook' },
+  { name: 'yt_url', label: 'ลิงก์ YouTube' },
+  { name: 'ig_url', label: 'ลิงก์ Instagram' },
+  { name: 'footer_desc', label: 'คำอธิบายท้ายเว็บไซต์ (Footer)', type: 'textarea' },
+  { name: 'copyright_text', label: 'ข้อความลิขสิทธิ์ท้ายเว็บ' }
+];
+
+async function renderSettingsView() {
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="panel panel-body pad" id="settingsPanel">กำลังโหลด...</div>';
+  try {
+    const settings = await apiGet('getSettings');
+    const fieldsHtml = SETTINGS_FIELDS.map(f => buildFieldHtml(f, settings[f.name])).join('');
+    document.getElementById('settingsPanel').innerHTML =
+      '<div id="formError" class="error-box"></div>' +
+      '<div class="form-grid">' + fieldsHtml + '</div>' +
+      '<div class="modal-actions" style="border-top:none;justify-content:flex-start">' +
+      '<button class="btn btn-gold" onclick="submitSettingsForm()">บันทึกการตั้งค่า</button></div>';
+  } catch (err) {
+    document.getElementById('settingsPanel').innerHTML = 'โหลดไม่สำเร็จ: ' + escapeHtml(err.message);
+  }
+}
+
+async function submitSettingsForm() {
+  const updates = {};
+  SETTINGS_FIELDS.forEach(f => { updates[f.name] = readFieldValue(f); });
+  try {
+    await apiPost('updateSettings', { token: authToken, updates: updates });
+    showToast('บันทึกการตั้งค่าแล้ว');
+  } catch (err) {
+    document.getElementById('formError').textContent = err.message;
+    document.getElementById('formError').style.display = 'block';
+  }
+}
+
+/* ==========================================================================
+   คลังไฟล์ (Media Library)
+   ========================================================================== */
+const MEDIA_CATEGORIES = ['Logo', 'Hero_Banners', 'News_Images', 'Gallery', 'Staff_Photos', 'Documents', 'Media_Library'];
+
+async function renderMediaView() {
+  const container = document.getElementById('viewContainer');
+  container.innerHTML =
+    '<div class="panel" style="margin-bottom:20px"><div class="panel-body pad">' +
+    '<div class="toolbar">' +
+    '<input type="file" id="mediaUploadInput" style="flex:1;min-width:180px">' +
+    '<select id="mediaUploadCategory">' + MEDIA_CATEGORIES.map(c => '<option value="' + c + '">' + c + '</option>').join('') + '</select>' +
+    '<button class="btn btn-gold btn-sm" onclick="doDirectUpload()">⬆️ อัปโหลด</button>' +
+    '</div></div></div>' +
+    '<div class="panel"><div class="panel-head"><h3>ไฟล์ทั้งหมด</h3></div>' +
+    '<div class="panel-body pad"><div class="media-grid" id="mediaLibGrid">กำลังโหลด...</div></div></div>';
+  loadMediaGrid();
+}
+
+async function loadMediaGrid() {
+  try {
+    const items = await apiGet('getMediaList', { token: authToken });
+    window.__data_media = items;
+    const grid = document.getElementById('mediaLibGrid');
+    if (!items.length) { grid.innerHTML = '<p style="color:var(--gray-500)">ยังไม่มีไฟล์ในคลัง</p>'; return; }
+    grid.innerHTML = items.map(m => {
+      const isImg = (m.mime_type || '').indexOf('image') === 0;
+      return '<div class="media-tile" style="cursor:default">' +
+        (isImg ? '<img src="' + driveImageUrl(m.drive_file_id) + '">' : '<div style="height:90px;display:flex;align-items:center;justify-content:center;font-size:26px">📄</div>') +
+        '<div class="fname" title="' + escapeHtml(m.filename) + '">' + escapeHtml(m.filename) + '</div>' +
+        '<div style="display:flex;gap:4px;padding:0 6px 6px">' +
+        '<button class="btn btn-outline btn-sm btn-icon" style="flex:1;font-size:10px" onclick="copyMediaId(\'' + m.drive_file_id + '\')">คัดลอก ID</button>' +
+        '<button class="btn btn-danger btn-sm btn-icon" onclick="deleteMediaItem(\'' + m.id + '\')">🗑️</button>' +
+        '</div></div>';
+    }).join('');
+  } catch (err) {
+    document.getElementById('mediaLibGrid').innerHTML = 'โหลดไม่สำเร็จ: ' + escapeHtml(err.message);
+  }
+}
+
+function copyMediaId(id) {
+  navigator.clipboard.writeText(id).then(() => showToast('คัดลอก File ID แล้ว')).catch(() => showToast('คัดลอกไม่สำเร็จ', 'error'));
+}
+
+async function doDirectUpload() {
+  const fileInput = document.getElementById('mediaUploadInput');
+  const category = document.getElementById('mediaUploadCategory').value;
+  const file = fileInput.files[0];
+  if (!file) { showToast('กรุณาเลือกไฟล์ก่อน', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = async function () {
+    const base64 = reader.result.split(',')[1];
+    try {
+      await apiPost('uploadFile', { token: authToken, data: { base64: base64, filename: file.name, mimeType: file.type, category: category } });
+      showToast('อัปโหลดสำเร็จ');
+      fileInput.value = '';
+      loadMediaGrid();
+    } catch (err) { showToast(err.message, 'error'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function deleteMediaItem(id) {
+  if (!confirmAction('ลบไฟล์นี้? (ไฟล์จะถูกย้ายเข้าถังขยะของ Google Drive)')) return;
+  try { await apiPost('deleteMedia', { token: authToken, id: id }); showToast('ลบไฟล์แล้ว'); loadMediaGrid(); }
+  catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ==========================================================================
+   ถังขยะ
+   ========================================================================== */
+const SHEET_LABELS = {
+  Menu_Main: 'เมนูหลัก', Menu_Footer: 'เมนู Footer', Hero_Slides: 'Hero', Stats: 'สถิติ',
+  Quick_Access: 'ทางลัด', News: 'ข่าวสาร', Gallery_Albums: 'อัลบั้มภาพ', Gallery_Photos: 'ภาพในอัลบั้ม', Staff: 'บุคลากร'
+};
+function trashItemPreview(dataJson) {
+  try {
+    const obj = JSON.parse(dataJson);
+    return obj.title || obj.label || obj.name || obj.heading || obj.caption || obj.id || '-';
+  } catch (e) { return '-'; }
+}
+
+async function renderTrashView() {
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="panel"><div class="panel-head"><h3>รายการในถังขยะ</h3></div>' +
+    '<div class="panel-body"><table><thead><tr><th>รายการ</th><th>ประเภท</th><th>ลบเมื่อ</th><th>จัดการ</th></tr></thead>' +
+    '<tbody id="tblBody-trash"><tr class="empty-row"><td colspan="4">กำลังโหลด...</td></tr></tbody></table></div></div>';
+  try {
+    const items = await apiGet('getTrash', { token: authToken });
+    const tbody = document.getElementById('tblBody-trash');
+    if (!items.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="4">ถังขยะว่างเปล่า</td></tr>'; return; }
+    tbody.innerHTML = items.map(t => {
+      const permBtn = authRole === 'admin'
+        ? '<button class="btn btn-danger btn-sm" onclick="permanentDeleteTrash(\'' + t.id + '\')">ลบถาวร</button>' : '';
+      return '<tr><td class="cell-main">' + escapeHtml(trashItemPreview(t.data_json)) + '</td>' +
+        '<td>' + (SHEET_LABELS[t.source_sheet] || t.source_sheet) + '</td>' +
+        '<td>' + formatDateTime(t.deleted_at) + '</td>' +
+        '<td><div class="row-actions">' +
+        '<button class="btn btn-outline btn-sm" onclick="restoreTrashItem(\'' + t.id + '\')">↩️ กู้คืน</button>' + permBtn +
+        '</div></td></tr>';
+    }).join('');
+  } catch (err) {
+    document.getElementById('tblBody-trash').innerHTML = '<tr class="empty-row"><td colspan="4">โหลดไม่สำเร็จ: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+async function restoreTrashItem(trashId) {
+  try { await apiPost('restoreFromTrash', { token: authToken, trashId: trashId }); showToast('กู้คืนแล้ว'); renderTrashView(); }
+  catch (err) { showToast(err.message, 'error'); }
+}
+async function permanentDeleteTrash(trashId) {
+  if (!confirmAction('ลบถาวร? การกระทำนี้ย้อนกลับไม่ได้')) return;
+  try { await apiPost('permanentlyDelete', { token: authToken, trashId: trashId }); showToast('ลบถาวรแล้ว'); renderTrashView(); }
+  catch (err) { showToast(err.message, 'error'); }
+}
+
+/* ==========================================================================
+   ประวัติการใช้งาน (Activity Log)
+   ========================================================================== */
+async function renderActivityView() {
+  const container = document.getElementById('viewContainer');
+  container.innerHTML = '<div class="panel"><div class="panel-head"><h3>ประวัติการใช้งานล่าสุด</h3></div>' +
+    '<div class="panel-body"><table><thead><tr><th>เวลา</th><th>การกระทำ</th><th>ประเภทข้อมูล</th><th>รายละเอียด</th></tr></thead>' +
+    '<tbody id="tblBody-activity"><tr class="empty-row"><td colspan="4">กำลังโหลด...</td></tr></tbody></table></div></div>';
+  try {
+    const items = await apiGet('getActivityLog', { token: authToken, limit: 150 });
+    const tbody = document.getElementById('tblBody-activity');
+    if (!items.length) { tbody.innerHTML = '<tr class="empty-row"><td colspan="4">ยังไม่มีประวัติการใช้งาน</td></tr>'; return; }
+    tbody.innerHTML = items.map(a =>
+      '<tr><td>' + formatDateTime(a.timestamp) + '</td><td>' + escapeHtml(a.action) + '</td>' +
+      '<td>' + (SHEET_LABELS[a.target_sheet] || a.target_sheet || '-') + '</td>' +
+      '<td class="cell-main">' + escapeHtml(a.detail) + '</td></tr>'
+    ).join('');
+  } catch (err) {
+    document.getElementById('tblBody-activity').innerHTML = '<tr class="empty-row"><td colspan="4">โหลดไม่สำเร็จ: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+/* ==========================================================================
+   เริ่มระบบ
+   ========================================================================== */
+document.getElementById('mobileMenuBtn').addEventListener('click', function () {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+document.addEventListener('DOMContentLoaded', checkSessionAndEnter);
+</script>
+
+</body>
+</html>
