@@ -16,7 +16,7 @@ const DEFAULT_DATA = {
     settings: {
         school_name_th: 'โรงเรียนวัดโป่งก้อนเส้า',
         school_name_en: 'Watpongkonsao School',
-        school_motto: 'มุ่งสู่ความเป็นเลิศ พัฒนาผู้เรียนสู่อนาคต',
+        school_motto: 'เรียนดี มีวินัย ใส่ใจสิ่งแวดล้อม',
         school_logo_abbr: 'ป.ก.ส.',
         school_logo_url: '',
         address: 'หมู่ 5 บ้านโป่งก้อนเส้า ตำบลท่ามะปราง อำเภอแก่งคอย จังหวัดสระบุรี',
@@ -32,7 +32,7 @@ const DEFAULT_DATA = {
         {
             BadgeText: '🏫 ยินดีต้อนรับสู่เว็บไซต์โรงเรียน',
             Title: 'ยินดีต้อนรับสู่<br>โรงเรียนวัดโป่งก้อนเส้า',
-            Subtitle: 'Watpongkonsao School · มุ่งสู่ความเป็นเลิศ พัฒนาผู้เรียนสู่อนาคต',
+            Subtitle: 'Watpongkonsao School · เรียนดี มีวินัย ใส่ใจสิ่งแวดล้อม',
             Btn1Text: 'รู้จักเรา →',
             Btn1Link: '#',
             Btn2Text: 'ติดต่อโรงเรียน',
@@ -47,13 +47,13 @@ const DEFAULT_DATA = {
     ],
     quickAccess: [
         { IconEmoji: '📰', Title: 'ประชาสัมพันธ์', TargetURL: '#' },
-        { IconEmoji: '📝', Title: 'รับสมัครงาน', TargetURL: '#' },
-        { IconEmoji: '🛒', Title: 'จัดซื้อจ้าง', TargetURL: '#' },
-        { IconEmoji: '⬇️', Title: 'เอกสารดาวน์โหลด', TargetURL: '#' },
+        //{ IconEmoji: '📝', Title: 'รับสมัครงาน', TargetURL: '#' },
+        //{ IconEmoji: '🛒', Title: 'จัดซื้อจ้าง', TargetURL: '#' },
+        //{ IconEmoji: '⬇️', Title: 'เอกสารดาวน์โหลด', TargetURL: '#' },
         { IconEmoji: '🖼️', Title: 'ภาพกิจกรรม', TargetURL: '#' },
         { IconEmoji: '👥', Title: 'ข้อมูลบุคลากร', TargetURL: '#' },
         { IconEmoji: '📞', Title: 'ติดต่อโรงเรียน', TargetURL: '#footer-contact-info' },
-        { IconEmoji: '🏫', Title: 'เว็บโรงเรียนใน', TargetURL: '#' }
+        //{ IconEmoji: '🏫', Title: 'เว็บโรงเรียนใน', TargetURL: '#' }
     ],
     featuredNews: null,
     latestNews: [],
@@ -431,7 +431,7 @@ window.openNewsModal = async function (id) {
 
     // เรียก API หลังบ้านเพื่อบันทึกยอดวิว +1 ใน Google Sheets
     if (CONFIG.API_URL) {
-        fetch(`${CONFIG.API_URL}?action=getNewsDetail&id=${id}`).catch(() => {});
+        fetch(`${CONFIG.API_URL}?action=getNewsDetail&id=${id}`).catch(() => { });
     }
 
     modal.classList.add('active');
