@@ -13,25 +13,10 @@
 
 <body>
 
-    <!-- ── AUTH LOGIN OVERLAY (แสดงเมื่อยังไม่ได้ยืนยันตัวตน) ── -->
-    <div class="auth-overlay" id="auth-screen">
-        <div class="auth-card">
-            <div class="auth-icon">ป.ก.ส.</div>
-            <h2>ระบบจัดการหลังบ้าน</h2>
-            <p>โรงเรียนวัดโป่งก้อนเส้า (Watpongkonsao School)</p>
-            <div class="form-group" style="text-align: left;">
-                <label>รหัสผ่าน PIN ผู้ดูแลระบบ (Default: admin1234)</label>
-                <input type="password" id="login-pin-input" placeholder="กรอกรหัสผ่าน 4-8 หลัก..." onkeydown="if(event.key==='Enter') verifyAdminLogin()">
-            </div>
-            <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;" onclick="verifyAdminLogin()">เข้าสู่ระบบ</button>
-            <a href="index.html" style="display: block; margin-top: 18px; font-size: 13px; color: var(--gray-500); text-decoration: none;">← กลับสู่หน้าแรกของเว็บไซต์</a>
-        </div>
-    </div>
-
     <!-- ── SIDEBAR NAVIGATION ── -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-icon">ป.ก.ส.</div>
+            <div class="brand-icon">ป.ก.</div>
             <div class="brand-info">
                 <strong>วัดโป่งก้อนเส้า</strong>
                 <span>Admin Dashboard V.1</span>
