@@ -137,6 +137,8 @@ window.navigateTab = function (tabId, clickedBtn) {
         clickedBtn.classList.add('active');
         document.getElementById('current-page-title').textContent = clickedBtn.textContent;
     }
+
+    if (tabId === 'facebook') loadFacebookSettings();
 };
 
 function initUI() {
@@ -358,10 +360,12 @@ function renderNewsTable() {
         return;
     }
 
-    tbody.innerHTML = list.map(n => `
+    tbody.innerHTML = list.map(n => {
+        const photoCount = getNewsImageList(n).length;
+        return `
         <tr>
             <td style="font-size:12.5px; color:var(--gray-500);">${n.PublishDate || '-'}</td>
-            <td style="font-weight:600; color:var(--navy);">${n.Title || ''}</td>
+            <td style="font-weight:600; color:var(--navy);">${isFacebookNews(n) ? '<span class="fb-badge" title="ซิงค์จาก Facebook">f</span>' : ''}${escapeHtml(n.Title)}${photoCount > 1 ? `<span class="photo-count">🖼 ${photoCount} รูป</span>` : ''}</td>
             <td><span class="status-pill pill-online" style="font-size:11px;">${n.Category || 'ทั่วไป'}</span></td>
             <td>${n.IsPinned ? '📌 ใช่' : '-'}</td>
             <td>👁 ${n.ViewCount || 0}</td>
@@ -369,14 +373,55 @@ function renderNewsTable() {
                 <button class="btn-danger-sm" onclick="deleteNewsItem('${n.ArticleID}')">ลบ</button>
             </td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
 
     renderOverviewMetrics();
 }
 
+// ข่าวที่ซิงค์มาจาก Facebook จะมี ArticleID ขึ้นต้นด้วย FB-
+function isFacebookNews(n) {
+    return String((n && n.ArticleID) || '').indexOf('FB-') === 0 || (n && n.Author) === 'Facebook';
+}
+
+// รวมรูปทั้งหมดของข่าว (Attachment_DriveUrls คั่นด้วยลูกน้ำ) โดยรูปแรกคือภาพปก
+function getNewsImageList(n) {
+    const list = String((n && n.Attachment_DriveUrls) || '').split(',').map(u => u.trim()).filter(Boolean);
+    if (n && n.DirectCoverUrl && list.indexOf(n.DirectCoverUrl) === -1) list.unshift(n.DirectCoverUrl);
+    return list;
+}
+
+const MAX_NEWS_IMAGES = 10;
+let newsPreviewUrls = [];
+
+function clearNewsPreview() {
+    newsPreviewUrls.forEach(u => URL.revokeObjectURL(u));
+    newsPreviewUrls = [];
+    const box = document.getElementById('news-file-preview');
+    if (box) box.innerHTML = '';
+}
+
+window.previewNewsFiles = function (input) {
+    clearNewsPreview();
+    const box = document.getElementById('news-file-preview');
+    if (!box) return;
+
+    const files = Array.from(input.files);
+    if (files.length > MAX_NEWS_IMAGES) {
+        showToast(`เลือกได้สูงสุด ${MAX_NEWS_IMAGES} รูป ระบบจะใช้ ${MAX_NEWS_IMAGES} รูปแรก`, 'error');
+    }
+
+    box.innerHTML = files.slice(0, MAX_NEWS_IMAGES).map((f, i) => {
+        const url = URL.createObjectURL(f);
+        newsPreviewUrls.push(url);
+        return `<div class="thumb"><img src="${url}" alt="">${i === 0 ? '<span class="thumb-cover">ปก</span>' : ''}</div>`;
+    }).join('');
+};
+
 window.openAddNewsModal = function () {
     document.getElementById('form-news-modal').reset();
     document.getElementById('news-edit-id').value = '';
+    clearNewsPreview();
     openModal('modal-add-news');
 };
 
@@ -394,74 +439,90 @@ window.submitNewsForm = async function (e) {
     saveBtn.disabled = true;
     saveBtn.textContent = 'กำลังบันทึกข้อมูล...';
 
-    let directCoverUrl = '';
+    try {
+        // ── อัปโหลดรูปทีละไฟล์ลง Google Drive (เรียงตามลำดับที่เลือก) ──
+        const files = fileInput ? Array.from(fileInput.files).slice(0, MAX_NEWS_IMAGES) : [];
+        const imageUrls = [];
 
-    // อัปโหลดรูปภาพลง Google Drive ถ้าต่อ API ไว้
-    if (fileInput && fileInput.files.length > 0 && ADMIN_CONFIG.API_URL) {
-        try {
-            saveBtn.textContent = 'กำลังอัปโหลดภาพลง Google Drive...';
-            const file = fileInput.files[0];
-            const base64 = await fileToBase64(file);
-
-            const uploadRes = await fetch(ADMIN_CONFIG.API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'uploadFile',
-                    folderCategory: 'news',
-                    fileName: file.name,
-                    mimeType: file.type,
-                    base64: base64
-                })
-            });
-            const uploadJson = await uploadRes.json();
-            if (uploadJson && uploadJson.directUrl) {
-                directCoverUrl = uploadJson.directUrl;
+        if (files.length > 0 && !ADMIN_CONFIG.API_URL) {
+            showToast('ยังไม่ได้เชื่อมต่อ Google Apps Script จึงไม่สามารถบันทึกรูปภาพได้ (ข่าวจะถูกบันทึกโดยไม่มีรูป)', 'error');
+        } else if (files.length > 0) {
+            let failed = 0;
+            for (let i = 0; i < files.length; i++) {
+                saveBtn.textContent = `กำลังอัปโหลดรูปที่ ${i + 1}/${files.length}...`;
+                try {
+                    const img = await prepareImageForUpload(files[i]);
+                    const uploadRes = await fetch(ADMIN_CONFIG.API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: 'uploadFile',
+                            folderCategory: 'news',
+                            fileName: img.fileName,
+                            mimeType: img.mimeType,
+                            base64: img.base64
+                        })
+                    });
+                    const uploadJson = await uploadRes.json();
+                    if (uploadJson && uploadJson.directUrl) {
+                        imageUrls.push(uploadJson.directUrl);
+                    } else {
+                        failed++;
+                    }
+                } catch (err) {
+                    console.error('Upload image error:', err);
+                    failed++;
+                }
             }
-        } catch (err) {
-            console.error('Upload image error:', err);
+            if (failed > 0) {
+                showToast(`อัปโหลดรูปไม่สำเร็จ ${failed} จาก ${files.length} รูป`, 'error');
+            }
         }
-    }
 
-    const newArticle = {
-        ArticleID: 'NEWS-' + Date.now(),
-        Category: cat,
-        Title: title,
-        Excerpt: excerpt,
-        Content: content || excerpt,
-        DirectCoverUrl: directCoverUrl,
-        IsPinned: isPinned,
-        PublishDate: new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }),
-        Author: 'admin',
-        ViewCount: 0,
-        Status: 'Published'
-    };
+        saveBtn.textContent = 'กำลังบันทึกข่าว...';
 
-    // ส่งบันทึกเข้า Google Sheets
-    if (ADMIN_CONFIG.API_URL) {
-        try {
-            await fetch(ADMIN_CONFIG.API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'saveNews', ...newArticle })
-            });
-        } catch (err) {
-            console.error('GAS saveNews error:', err);
+        const newArticle = {
+            ArticleID: 'NEWS-' + Date.now(),
+            Category: cat,
+            Title: title,
+            Excerpt: excerpt,
+            Content: content || excerpt,
+            DirectCoverUrl: imageUrls[0] || '',
+            Attachment_DriveUrls: imageUrls.join(','),
+            IsPinned: isPinned,
+            PublishDate: new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' }),
+            Author: 'admin',
+            ViewCount: 0,
+            Status: 'Published'
+        };
+
+        // ส่งบันทึกเข้า Google Sheets
+        if (ADMIN_CONFIG.API_URL) {
+            try {
+                await fetch(ADMIN_CONFIG.API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'saveNews', ...newArticle })
+                });
+            } catch (err) {
+                console.error('GAS saveNews error:', err);
+            }
         }
+
+        if (isPinned) {
+            db.featuredNews = newArticle;
+        }
+        db.latestNews = [newArticle, ...(db.latestNews || [])];
+        saveLocalDatabase();
+
+        closeModal('modal-add-news');
+        clearNewsPreview();
+        renderNewsTable();
+        showToast('เพิ่มข่าวสารประชาสัมพันธ์สำเร็จแล้ว!', 'success');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '🚀 บันทึกและเผยแพร่ข่าว';
     }
-
-    if (isPinned) {
-        db.featuredNews = newArticle;
-    }
-    db.latestNews = [newArticle, ...(db.latestNews || [])];
-    saveLocalDatabase();
-
-    closeModal('modal-add-news');
-    renderNewsTable();
-    showToast('เพิ่มข่าวสารประชาสัมพันธ์สำเร็จแล้ว!', 'success');
-
-    saveBtn.disabled = false;
-    saveBtn.textContent = '🚀 บันทึกและเผยแพร่ข่าว';
 };
 
 window.deleteNewsItem = async function (id) {
@@ -806,8 +867,181 @@ window.exportDataJson = function () {
 };
 
 // ==============================================================================
+// 10.5 FACEBOOK AUTO-SYNC (ตั้งค่า / เปิด-ปิด Trigger / ซิงค์ทันที)
+// ==============================================================================
+const FB_TOKEN_MASK = '••••••••';
+
+function setFbTriggerStatus(active) {
+    const pill = document.getElementById('fb-trigger-status');
+    if (!pill) return;
+    if (active) {
+        pill.className = 'status-pill pill-online';
+        pill.innerHTML = '🟢 เปิดใช้งานอยู่ (ซิงค์ทุก 1 ชั่วโมง)';
+    } else {
+        pill.className = 'status-pill pill-offline';
+        pill.innerHTML = '🔴 ยังไม่เปิดใช้งาน';
+    }
+}
+
+async function postToBackend(payload) {
+    const res = await fetch(ADMIN_CONFIG.API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+    });
+    return res.json();
+}
+
+function requireApiUrl() {
+    if (!ADMIN_CONFIG.API_URL) {
+        showToast('ต้องระบุ Google Apps Script Web App URL ก่อน (ตั้งค่าที่แท็บตั้งค่าระบบ)', 'error');
+        return false;
+    }
+    return true;
+}
+
+window.loadFacebookSettings = async function () {
+    const pageInput = document.getElementById('fb-page-id');
+    const tokenInput = document.getElementById('fb-access-token');
+    if (!pageInput || !tokenInput) return;
+
+    if (!ADMIN_CONFIG.API_URL) {
+        setFbTriggerStatus(false);
+        return;
+    }
+
+    try {
+        const res = await fetch(`${ADMIN_CONFIG.API_URL}?action=getFacebookSettings`);
+        const json = await res.json();
+        if (json && json.success) {
+            pageInput.value = json.fb_page_id || '';
+            tokenInput.value = json.fb_has_token ? FB_TOKEN_MASK : '';
+            setFbTriggerStatus(!!json.fb_trigger_active);
+        }
+    } catch (err) {
+        showToast('โหลดการตั้งค่า Facebook ไม่สำเร็จ: ' + err.message, 'error');
+    }
+};
+
+window.saveFacebookSettings = async function () {
+    if (!requireApiUrl()) return;
+
+    const pageId = document.getElementById('fb-page-id').value.trim();
+    const token = document.getElementById('fb-access-token').value.trim();
+
+    if (!pageId) {
+        showToast('กรุณากรอก Facebook Page ID', 'error');
+        return;
+    }
+    if (!token) {
+        showToast('กรุณากรอก Page Access Token', 'error');
+        return;
+    }
+
+    try {
+        // ถ้าช่อง Token ยังเป็นตัวจุดที่ระบบซ่อนไว้ backend จะคงค่าเดิมไว้ให้
+        const json = await postToBackend({ action: 'saveFacebookSettings', fb_page_id: pageId, fb_access_token: token });
+        if (json && json.success) {
+            showToast(json.message || 'บันทึกการตั้งค่า Facebook สำเร็จ', 'success');
+            document.getElementById('fb-access-token').value = FB_TOKEN_MASK;
+        } else {
+            showToast((json && json.error) || 'บันทึกไม่สำเร็จ', 'error');
+        }
+    } catch (err) {
+        showToast('บันทึกไม่สำเร็จ: ' + err.message, 'error');
+    }
+};
+
+window.enableFacebookTrigger = async function () {
+    if (!requireApiUrl()) return;
+    try {
+        const json = await postToBackend({ action: 'setupFacebookTrigger' });
+        if (json && json.success) {
+            showToast(json.message, 'success');
+            setFbTriggerStatus(true);
+        } else {
+            showToast((json && json.error) || 'เปิดระบบซิงค์ไม่สำเร็จ', 'error');
+        }
+    } catch (err) {
+        showToast('เปิดระบบซิงค์ไม่สำเร็จ: ' + err.message, 'error');
+    }
+};
+
+window.disableFacebookTrigger = async function () {
+    if (!requireApiUrl()) return;
+    try {
+        const json = await postToBackend({ action: 'removeFacebookTrigger' });
+        if (json && json.success) {
+            showToast(json.message, 'success');
+            setFbTriggerStatus(false);
+        } else {
+            showToast((json && json.error) || 'ปิดระบบซิงค์ไม่สำเร็จ', 'error');
+        }
+    } catch (err) {
+        showToast('ปิดระบบซิงค์ไม่สำเร็จ: ' + err.message, 'error');
+    }
+};
+
+window.forceSyncFacebook = async function () {
+    if (!requireApiUrl()) return;
+    showToast('กำลังดึงโพสต์จาก Facebook... (อาจใช้เวลาสักครู่)', 'info');
+    try {
+        const res = await fetch(`${ADMIN_CONFIG.API_URL}?action=forceSyncFacebook`);
+        const json = await res.json();
+        if (json && json.success) {
+            showToast(json.message, 'success');
+            if (json.added > 0) syncDataWithBackend(false);
+        } else {
+            showToast((json && (json.message || json.error)) || 'ซิงค์ไม่สำเร็จ', 'error');
+        }
+    } catch (err) {
+        showToast('ซิงค์ไม่สำเร็จ: ' + err.message, 'error');
+    }
+};
+
+// ==============================================================================
 // 11. HELPER UTILITIES
 // ==============================================================================
+function escapeHtml(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// ย่อรูปก่อนอัปโหลด (ด้านยาวสุด 1600px, JPEG 85%) ให้อัปโหลดหลายรูปได้เร็วขึ้น
+// หากย่อไม่ได้หรือไฟล์ไม่เล็กลง จะใช้ไฟล์ต้นฉบับ
+async function prepareImageForUpload(file) {
+    const MAX_SIDE = 1600;
+    try {
+        if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('keep original');
+
+        const bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        if (bitmap.close) bitmap.close();
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+        if (!blob || blob.size >= file.size) throw new Error('keep original');
+
+        return {
+            base64: await fileToBase64(blob),
+            mimeType: 'image/jpeg',
+            fileName: file.name.replace(/\.[^.]+$/, '') + '.jpg'
+        };
+    } catch (e) {
+        return { base64: await fileToBase64(file), mimeType: file.type, fileName: file.name };
+    }
+}
+
 window.openModal = function (id) {
     const m = document.getElementById(id);
     if (m) m.classList.add('active');
