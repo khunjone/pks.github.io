@@ -114,6 +114,33 @@ async function fetchLiveData() {
 }
 
 // ==============================================================================
+// 1.5 ตัวช่วยสำหรับข่าว (รูปหลายรูป / ที่มาจาก Facebook / ป้องกัน HTML)
+// ==============================================================================
+function esc(str) {
+    return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// ข่าวที่ซิงค์จาก Facebook จะมี ArticleID ขึ้นต้นด้วย FB-
+function isFacebookNews(n) {
+    return String((n && n.ArticleID) || '').indexOf('FB-') === 0 || (n && n.Author) === 'Facebook';
+}
+
+// รูปทั้งหมดของข่าว: Attachment_DriveUrls (คั่นด้วยลูกน้ำ) โดยรูปแรกคือภาพปก
+function getNewsImages(n) {
+    if (!n) return [];
+    const list = String(n.Attachment_DriveUrls || '').split(',').map(u => u.trim()).filter(Boolean);
+    if (n.DirectCoverUrl && list.indexOf(n.DirectCoverUrl) === -1) list.unshift(n.DirectCoverUrl);
+    return list;
+}
+
+// รูปภาพที่โหลดไม่ได้ (เช่น ลิงก์หมดอายุ) ให้ซ่อนไป แล้วโชว์พื้นหลังไล่สีแทน
+const IMG_FALLBACK = `onerror="this.style.display='none'"`;
+
+// ==============================================================================
 // 2. ฟังก์ชันเรนเดอร์ข้อมูลลงในหน้าเว็บ
 // ==============================================================================
 function renderAll(data) {
@@ -253,22 +280,27 @@ function renderFeaturedNews(n) {
         return;
     }
 
-    const imgHtml = n.DirectCoverUrl
-        ? `<img src="${n.DirectCoverUrl}" alt="${n.Title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+    const images = getNewsImages(n);
+    const imgHtml = images.length > 0
+        ? `<img src="${esc(images[0])}" alt="${esc(n.Title)}" ${IMG_FALLBACK} style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
         : '';
+    const fbHtml = isFacebookNews(n) ? '<span class="fb-source" title="โพสต์จาก Facebook">f</span>' : '';
+    const countHtml = images.length > 1 ? `<span class="photo-count-chip">🖼 ${images.length} รูป</span>` : '';
 
     container.innerHTML = `
         <div class="featured-card">
             <div class="featured-img" style="position:relative">
                 ${imgHtml}
                 <span class="featured-badge">📌 ปักหมุด</span>
+                ${fbHtml}
+                ${countHtml}
             </div>
             <div class="featured-body">
-                <div class="featured-cat">📢 ${n.Category || 'ประชาสัมพันธ์'} · ${n.PublishDate || ''}</div>
-                <div class="featured-title">${n.Title || ''}</div>
-                <div class="featured-desc">${n.Excerpt || ''}</div>
+                <div class="featured-cat">📢 ${esc(n.Category || 'ประชาสัมพันธ์')} · ${esc(n.PublishDate)}</div>
+                <div class="featured-title">${esc(n.Title)}</div>
+                <div class="featured-desc">${esc(n.Excerpt)}</div>
                 <div class="featured-meta">
-                    <span>👤 ${n.Author || 'admin'}</span>
+                    <span>👤 ${esc(n.Author || 'admin')}</span>
                     <span>👁 <span>${n.ViewCount || 0}</span> ครั้ง</span>
                 </div>
                 <button class="read-more" onclick="openNewsModal('${n.ArticleID}')">อ่านต่อ →</button>
@@ -303,25 +335,31 @@ function renderNewsGrid(newsList) {
 
     container.innerHTML = newsList.map(n => {
         const badgeClass = n.CategoryBadgeClass || badgeMap[n.Category] || 'cat-news';
-        const coverHtml = n.DirectCoverUrl
-            ? `<img src="${n.DirectCoverUrl}" alt="${n.Title}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
+        // หน้าแรกแสดงเฉพาะรูปแรกเป็นภาพปก (รูปทั้งหมดดูได้ในหน้าต่างอ่านข่าวฉบับเต็ม)
+        const images = getNewsImages(n);
+        const coverHtml = images.length > 0
+            ? `<img src="${esc(images[0])}" alt="${esc(n.Title)}" loading="lazy" ${IMG_FALLBACK} style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">`
             : '';
+        const fbHtml = isFacebookNews(n) ? '<span class="fb-source" title="โพสต์จาก Facebook">f</span>' : '';
+        const countHtml = images.length > 1 ? `<span class="photo-count-chip">🖼 ${images.length}</span>` : '';
 
         return `
             <div class="news-card">
                 <div class="news-img" style="position:relative; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);">
                     ${coverHtml}
-                    📢<span class="news-cat-badge ${badgeClass}">${n.Category || 'ข่าวสาร'}</span>
+                    📢<span class="news-cat-badge ${badgeClass}">${esc(n.Category || 'ข่าวสาร')}</span>
+                    ${fbHtml}
+                    ${countHtml}
                 </div>
                 <div class="news-body">
                     <div class="news-meta">
-                        <span>📅 ${n.PublishDate || ''}</span>
+                        <span>📅 ${esc(n.PublishDate)}</span>
                         <span>👁 ${n.ViewCount || 0} อ่าน</span>
                     </div>
-                    <div class="news-title">${n.Title || ''}</div>
-                    <div class="news-excerpt">${n.Excerpt || ''}</div>
+                    <div class="news-title">${esc(n.Title)}</div>
+                    <div class="news-excerpt">${esc(n.Excerpt)}</div>
                     <div class="news-footer">
-                        <span class="news-author"><span class="author-avatar">👤</span>${n.Author || 'admin'}</span>
+                        <span class="news-author"><span class="author-avatar">👤</span>${esc(n.Author || 'admin')}</span>
                         <button class="news-link" onclick="openNewsModal('${n.ArticleID}')">อ่านต่อ →</button>
                     </div>
                 </div>
@@ -407,22 +445,16 @@ window.openNewsModal = async function (id) {
     }
 
     document.getElementById('modal-news-title').textContent = item.Title || '';
+    const fbMeta = isFacebookNews(item) ? '<span><span class="fb-source inline">f</span>จาก Facebook</span>' : '';
     document.getElementById('modal-news-meta').innerHTML = `
-        <span>📂 ${item.Category || 'ข่าวสาร'}</span>
-        <span>📅 ${item.PublishDate || ''}</span>
-        <span>👤 ${item.Author || 'admin'}</span>
+        <span>📂 ${esc(item.Category || 'ข่าวสาร')}</span>
+        <span>📅 ${esc(item.PublishDate)}</span>
+        <span>👤 ${esc(item.Author || 'admin')}</span>
         <span>👁 <span id="modal-view-count">${(item.ViewCount || 0) + 1}</span> เข้าชม</span>
+        ${fbMeta}
     `;
 
-    const imgWrap = document.getElementById('modal-news-img-wrap');
-    if (imgWrap) {
-        if (item.DirectCoverUrl) {
-            imgWrap.innerHTML = `<img src="${item.DirectCoverUrl}" class="modal-news-img" alt="${item.Title}">`;
-            imgWrap.style.display = 'block';
-        } else {
-            imgWrap.style.display = 'none';
-        }
-    }
+    renderNewsGallery(item);
 
     document.getElementById('modal-news-body').textContent = item.Content || item.Excerpt || '';
 
@@ -436,6 +468,77 @@ window.openNewsModal = async function (id) {
 
     modal.classList.add('active');
 };
+
+// แสดงรูปในหน้าต่างอ่านข่าว: 1 รูป = ภาพเดี่ยว, หลายรูป = รูปแรกใหญ่ + แถวรูปย่อ
+let lightboxImages = [];
+let lightboxIndex = 0;
+
+function renderNewsGallery(item) {
+    const imgWrap = document.getElementById('modal-news-img-wrap');
+    if (!imgWrap) return;
+
+    const images = getNewsImages(item);
+    lightboxImages = images;
+
+    if (images.length === 0) {
+        imgWrap.innerHTML = '';
+        imgWrap.style.display = 'none';
+        return;
+    }
+
+    const alt = esc(item.Title);
+    if (images.length === 1) {
+        imgWrap.innerHTML = `<img src="${esc(images[0])}" class="modal-news-img" alt="${alt}" ${IMG_FALLBACK} onclick="openLightbox(0)" style="cursor:zoom-in;">`;
+    } else {
+        const thumbs = images.slice(1).map((u, i) =>
+            `<img src="${esc(u)}" alt="${alt} รูปที่ ${i + 2}" loading="lazy" ${IMG_FALLBACK} onclick="openLightbox(${i + 1})">`
+        ).join('');
+        const cols = Math.min(images.length - 1, 4);
+        imgWrap.innerHTML = `
+            <div class="news-gallery">
+                <div class="gallery-main"><img src="${esc(images[0])}" alt="${alt}" ${IMG_FALLBACK} onclick="openLightbox(0)"></div>
+                <div class="gallery-thumbs" style="grid-template-columns: repeat(${cols}, 1fr);">${thumbs}</div>
+            </div>
+        `;
+    }
+    imgWrap.style.display = 'block';
+}
+
+window.openLightbox = function (index) {
+    const box = document.getElementById('lightbox');
+    if (!box || lightboxImages.length === 0) return;
+    lightboxIndex = index;
+    updateLightbox();
+    box.classList.add('active');
+};
+
+window.closeLightbox = function () {
+    const box = document.getElementById('lightbox');
+    if (box) box.classList.remove('active');
+};
+
+window.stepLightbox = function (delta) {
+    const total = lightboxImages.length;
+    if (total < 2) return;
+    lightboxIndex = (lightboxIndex + delta + total) % total;
+    updateLightbox();
+};
+
+function updateLightbox() {
+    const total = lightboxImages.length;
+    document.getElementById('lightbox-img').src = lightboxImages[lightboxIndex];
+    document.getElementById('lightbox-count').textContent = `${lightboxIndex + 1} / ${total}`;
+    document.getElementById('lightbox-prev').classList.toggle('hidden', total < 2);
+    document.getElementById('lightbox-next').classList.toggle('hidden', total < 2);
+}
+
+document.addEventListener('keydown', (e) => {
+    const box = document.getElementById('lightbox');
+    if (!box || !box.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') stepLightbox(-1);
+    else if (e.key === 'ArrowRight') stepLightbox(1);
+});
 
 window.closeNewsModal = function () {
     const modal = document.getElementById('news-modal');
@@ -477,8 +580,8 @@ function setupSearch() {
                             <div class="search-result-item" onclick="openNewsModal('${n.ArticleID}'); document.getElementById('search-dropdown').classList.remove('active');">
                                 <div class="search-thumb">📰</div>
                                 <div class="search-info">
-                                    <div class="search-title">${n.Title}</div>
-                                    <div class="search-sub">${n.Category} · ${n.PublishDate}</div>
+                                    <div class="search-title">${esc(n.Title)}</div>
+                                    <div class="search-sub">${esc(n.Category)} · ${esc(n.PublishDate)}</div>
                                 </div>
                             </div>
                         `;
