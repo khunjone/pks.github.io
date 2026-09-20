@@ -55,6 +55,7 @@
             <button class="nav-link" onclick="navigateTab('contact', this)">✉️ ข้อความติดต่อ (Inquiries)</button>
 
             <div class="nav-group-title">ระบบและฐานข้อมูล</div>
+            <button class="nav-link" onclick="navigateTab('facebook', this)">🔄 ซิงค์ข้อมูล Facebook</button>
             <button class="nav-link" onclick="navigateTab('api', this)">⚙️ Google Apps Script API</button>
         </nav>
 
@@ -392,6 +393,46 @@
                 </div>
             </section>
 
+            <!-- ── TAB 11: FACEBOOK SYNC SETTINGS ── -->
+            <section class="tab-pane" id="pane-facebook" style="display: none;">
+                <div class="admin-card">
+                    <div class="card-title-bar">
+                        <h3>🔄 ตั้งค่าระบบซิงค์ข้อมูลจาก Facebook อัตโนมัติ</h3>
+                        <button class="btn-gold" onclick="saveFacebookSettings()">💾 บันทึกการตั้งค่า Facebook</button>
+                    </div>
+                    <p style="font-size: 14px; line-height: 1.7; color: var(--gray-700); margin-bottom: 16px;">
+                        ระบบนี้จะดึงโพสต์จากเพจ Facebook ของโรงเรียนมาบันทึกเป็นข่าวประชาสัมพันธ์อัตโนมัติทุกๆ 1 ชั่วโมง
+                        คุณต้องสร้าง App ใน <a href="https://developers.facebook.com/" target="_blank" style="color:var(--gold-dark);font-weight:600;">Facebook Developers</a>
+                        แล้วนำ <strong>Page ID</strong> และ <strong>Page Access Token</strong> มากรอกที่นี่ครับ
+                    </p>
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Facebook Page ID <span style="color:red">*</span></label>
+                            <input type="text" id="fb-page-id" placeholder="เช่น 123456789012345">
+                            <small>หมายเลข Page ID ของเพจ Facebook โรงเรียน</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Page Access Token <span style="color:red">*</span></label>
+                            <input type="password" id="fb-access-token" placeholder="EAAxxxxxxx..." autocomplete="off">
+                            <small>Long-lived Page Access Token ที่ได้จาก Facebook Developer</small>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 16px; margin-top: 12px;">
+                        <div style="font-weight: 700; color: var(--navy); margin-bottom: 10px;">⏰ ระบบซิงค์อัตโนมัติ (Trigger ทุก 1 ชั่วโมง)</div>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                            <span>สถานะ:</span>
+                            <span id="fb-trigger-status" class="status-pill pill-offline">🔴 ยังไม่เปิดใช้งาน</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn-primary" onclick="enableFacebookTrigger()">▶️ เปิดระบบซิงค์อัตโนมัติ</button>
+                            <button class="btn-secondary" onclick="disableFacebookTrigger()">⏹️ ปิดระบบซิงค์อัตโนมัติ</button>
+                            <button class="btn-gold" onclick="forceSyncFacebook()">🔄 บังคับซิงค์ทันที (Force Sync)</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
 
@@ -421,10 +462,12 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>ภาพปกข่าว (อัปโหลดเข้า Google Drive)</label>
-                            <input type="file" id="news-field-file" accept="image/*">
+                            <label>รูปภาพประกอบข่าว (เลือกได้หลายรูป)</label>
+                            <input type="file" id="news-field-file" accept="image/*" multiple onchange="previewNewsFiles(this)">
+                            <small>อัปโหลดเข้า Google Drive · สูงสุด 10 รูป · รูปแรกจะเป็นภาพปกข่าว</small>
                         </div>
                     </div>
+                    <div id="news-file-preview" class="file-preview"></div>
                     <div class="form-group">
                         <label>เนื้อหาย่อ (แสดงในการ์ดหน้าแรก) <span style="color:red">*</span></label>
                         <textarea id="news-field-excerpt" rows="2" placeholder="สรุปสั้นๆ 1-2 บรรทัด..." required></textarea>
