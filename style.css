@@ -147,7 +147,7 @@ header {
     width: 52px;
     height: 52px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    background: white;
     display: flex;
     align-items: center;
     justify-content: center;
