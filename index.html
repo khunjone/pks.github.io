@@ -231,6 +231,15 @@
         </div>
     </div>
 
+    <!-- ── LIGHTBOX: ดูรูปข่าวขนาดใหญ่ ── -->
+    <div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()" aria-label="ปิด">✕</button>
+        <button class="lightbox-nav prev" id="lightbox-prev" onclick="stepLightbox(-1)" aria-label="รูปก่อนหน้า">‹</button>
+        <img id="lightbox-img" src="" alt="">
+        <button class="lightbox-nav next" id="lightbox-next" onclick="stepLightbox(1)" aria-label="รูปถัดไป">›</button>
+        <div class="lightbox-count" id="lightbox-count"></div>
+    </div>
+
 </body>
 
 </html>
