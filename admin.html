@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดการหลังบ้าน - โรงเรียนวัดโป่งก้อนเส้า</title>
+    <title>Admin - โรงเรียนวัดโป่งก้อนเส้า</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Mitr:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin.css">
@@ -16,11 +16,11 @@
     <!-- ── AUTH LOGIN OVERLAY (แสดงเมื่อยังไม่ได้ยืนยันตัวตน) ── -->
     <div class="auth-overlay" id="auth-screen">
         <div class="auth-card">
-            <div class="auth-icon">ป.ก.ส.</div>
-            <h2>ระบบจัดการหลังบ้าน</h2>
+            <div class="auth-icon">ป.ก.</div>
+            <h2>Admin</h2>
             <p>โรงเรียนวัดโป่งก้อนเส้า (Watpongkonsao School)</p>
             <div class="form-group" style="text-align: left;">
-                <label>รหัสผ่าน PIN ผู้ดูแลระบบ (Default: admin1234)</label>
+                <label>รหัสผ่าน PIN ผู้ดูแลระบบ</label>
                 <input type="password" id="login-pin-input" placeholder="กรอกรหัสผ่าน 4-8 หลัก..." onkeydown="if(event.key==='Enter') verifyAdminLogin()">
             </div>
             <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;" onclick="verifyAdminLogin()">เข้าสู่ระบบ</button>
@@ -31,7 +31,7 @@
     <!-- ── SIDEBAR NAVIGATION ── -->
     <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-icon">ป.ก.ส.</div>
+            <div class="brand-icon">ป.ก.</div>
             <div class="brand-info">
                 <strong>วัดโป่งก้อนเส้า</strong>
                 <span>Admin Dashboard V.1</span>
@@ -153,7 +153,7 @@
                             </div>
                             <div class="form-group">
                                 <label>ตัวย่อตราโรงเรียน</label>
-                                <input type="text" id="set-school-logo-abbr" value="ป.ก.ส.">
+                                <input type="text" id="set-school-logo-abbr" value="ป.ก.">
                             </div>
                         </div>
                         <div class="form-group">
