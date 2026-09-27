@@ -867,137 +867,124 @@ window.exportDataJson = function () {
 };
 
 // ==============================================================================
-// 10.5 FACEBOOK AUTO-SYNC (ตั้งค่า / เปิด-ปิด Trigger / ซิงค์ทันที)
+// FACEBOOK AUTO-SYNC MANAGEMENT
 // ==============================================================================
-const FB_TOKEN_MASK = '••••••••';
 
-function setFbTriggerStatus(active) {
-    const pill = document.getElementById('fb-trigger-status');
-    if (!pill) return;
-    if (active) {
-        pill.className = 'status-pill pill-online';
-        pill.innerHTML = '🟢 เปิดใช้งานอยู่ (ซิงค์ทุก 1 ชั่วโมง)';
-    } else {
-        pill.className = 'status-pill pill-offline';
-        pill.innerHTML = '🔴 ยังไม่เปิดใช้งาน';
-    }
-}
-
-async function postToBackend(payload) {
-    const res = await fetch(ADMIN_CONFIG.API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-    });
-    return res.json();
-}
-
-function requireApiUrl() {
-    if (!ADMIN_CONFIG.API_URL) {
-        showToast('ต้องระบุ Google Apps Script Web App URL ก่อน (ตั้งค่าที่แท็บตั้งค่าระบบ)', 'error');
-        return false;
-    }
-    return true;
-}
-
-window.loadFacebookSettings = async function () {
-    const pageInput = document.getElementById('fb-page-id');
-    const tokenInput = document.getElementById('fb-access-token');
-    if (!pageInput || !tokenInput) return;
-
-    if (!ADMIN_CONFIG.API_URL) {
-        setFbTriggerStatus(false);
-        return;
-    }
-
+// โหลดการตั้งค่า Facebook เมื่อเปิดแท็บหรือหน้าเว็บ
+async function loadFacebookSettings() {
+    if (!ADMIN_CONFIG.API_URL) return;
     try {
         const res = await fetch(`${ADMIN_CONFIG.API_URL}?action=getFacebookSettings`);
         const json = await res.json();
-        if (json && json.success) {
-            pageInput.value = json.fb_page_id || '';
-            tokenInput.value = json.fb_has_token ? FB_TOKEN_MASK : '';
-            setFbTriggerStatus(!!json.fb_trigger_active);
+        if (json.success) {
+            const pageIdInput = document.getElementById('fb-page-id');
+            const tokenInput = document.getElementById('fb-access-token');
+            const statusBadge = document.getElementById('fb-trigger-status');
+
+            if (pageIdInput) pageIdInput.value = json.fb_page_id || '';
+            if (tokenInput && json.fb_has_token) tokenInput.placeholder = '•••••••• (ตั้งค่าไว้แล้ว)';
+            
+            if (statusBadge) {
+                if (json.fb_trigger_active) {
+                    statusBadge.className = 'status-pill pill-online';
+                    statusBadge.innerHTML = '🟢 เปิดใช้งานอยู่ (ทุก 1 ชั่วโมง)';
+                } else {
+                    statusBadge.className = 'status-pill pill-offline';
+                    statusBadge.innerHTML = '🔴 ยังไม่เปิดใช้งาน';
+                }
+            }
         }
-    } catch (err) {
-        showToast('โหลดการตั้งค่า Facebook ไม่สำเร็จ: ' + err.message, 'error');
+    } catch (e) {
+        console.warn('โหลดค่า Facebook ไม่สำเร็จ:', e);
     }
-};
+}
 
 window.saveFacebookSettings = async function () {
-    if (!requireApiUrl()) return;
-
-    const pageId = document.getElementById('fb-page-id').value.trim();
-    const token = document.getElementById('fb-access-token').value.trim();
+    const pageId = document.getElementById('fb-page-id')?.value.trim();
+    const token = document.getElementById('fb-access-token')?.value.trim();
 
     if (!pageId) {
-        showToast('กรุณากรอก Facebook Page ID', 'error');
+        showToast('กรุณาระบุ Facebook Page ID', 'error');
         return;
     }
-    if (!token) {
-        showToast('กรุณากรอก Page Access Token', 'error');
+
+    if (!ADMIN_CONFIG.API_URL) {
+        showToast('กรุณาระบุ Apps Script Web App URL ก่อน', 'error');
         return;
     }
 
     try {
-        // ถ้าช่อง Token ยังเป็นตัวจุดที่ระบบซ่อนไว้ backend จะคงค่าเดิมไว้ให้
-        const json = await postToBackend({ action: 'saveFacebookSettings', fb_page_id: pageId, fb_access_token: token });
-        if (json && json.success) {
-            showToast(json.message || 'บันทึกการตั้งค่า Facebook สำเร็จ', 'success');
-            document.getElementById('fb-access-token').value = FB_TOKEN_MASK;
-        } else {
-            showToast((json && json.error) || 'บันทึกไม่สำเร็จ', 'error');
+        const payload = { action: 'saveFacebookSettings', fb_page_id: pageId };
+        if (token) payload.fb_access_token = token;
+
+        const res = await fetch(ADMIN_CONFIG.API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.success) {
+            showToast('บันทึกการตั้งค่า Facebook สำเร็จ', 'success');
+            loadFacebookSettings();
         }
-    } catch (err) {
-        showToast('บันทึกไม่สำเร็จ: ' + err.message, 'error');
+    } catch (e) {
+        showToast('เกิดข้อผิดพลาดในการบันทึก Facebook', 'error');
     }
 };
 
 window.enableFacebookTrigger = async function () {
-    if (!requireApiUrl()) return;
+    if (!ADMIN_CONFIG.API_URL) return showToast('ยังไม่ได้ระบุ Web App URL', 'error');
     try {
-        const json = await postToBackend({ action: 'setupFacebookTrigger' });
-        if (json && json.success) {
-            showToast(json.message, 'success');
-            setFbTriggerStatus(true);
-        } else {
-            showToast((json && json.error) || 'เปิดระบบซิงค์ไม่สำเร็จ', 'error');
+        const res = await fetch(ADMIN_CONFIG.API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'setupFacebookTrigger' })
+        });
+        const json = await res.json();
+        if (json.success) {
+            showToast('เปิดระบบซิงค์ Facebook ทุก 1 ชม. เรียบร้อย', 'success');
+            loadFacebookSettings();
         }
-    } catch (err) {
-        showToast('เปิดระบบซิงค์ไม่สำเร็จ: ' + err.message, 'error');
+    } catch (e) {
+        showToast('เปิด Trigger ไม่สำเร็จ', 'error');
     }
 };
 
 window.disableFacebookTrigger = async function () {
-    if (!requireApiUrl()) return;
+    if (!ADMIN_CONFIG.API_URL) return showToast('ยังไม่ได้ระบุ Web App URL', 'error');
     try {
-        const json = await postToBackend({ action: 'removeFacebookTrigger' });
-        if (json && json.success) {
-            showToast(json.message, 'success');
-            setFbTriggerStatus(false);
-        } else {
-            showToast((json && json.error) || 'ปิดระบบซิงค์ไม่สำเร็จ', 'error');
+        const res = await fetch(ADMIN_CONFIG.API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'removeFacebookTrigger' })
+        });
+        const json = await res.json();
+        if (json.success) {
+            showToast('ปิดระบบซิงค์อัตโนมัติเรียบร้อย', 'info');
+            loadFacebookSettings();
         }
-    } catch (err) {
-        showToast('ปิดระบบซิงค์ไม่สำเร็จ: ' + err.message, 'error');
+    } catch (e) {
+        showToast('ปิด Trigger ไม่สำเร็จ', 'error');
     }
 };
 
 window.forceSyncFacebook = async function () {
-    if (!requireApiUrl()) return;
-    showToast('กำลังดึงโพสต์จาก Facebook... (อาจใช้เวลาสักครู่)', 'info');
+    if (!ADMIN_CONFIG.API_URL) return showToast('ยังไม่ได้ระบุ Web App URL', 'error');
+    showToast('กำลังสั่งซิงค์ข้อมูลจาก Facebook...', 'info');
     try {
         const res = await fetch(`${ADMIN_CONFIG.API_URL}?action=forceSyncFacebook`);
         const json = await res.json();
-        if (json && json.success) {
-            showToast(json.message, 'success');
-            if (json.added > 0) syncDataWithBackend(false);
+        if (json.success) {
+            showToast('ซิงค์ข้อมูลจาก Facebook สำเร็จ! ตรวจสอบที่แท็บข่าวสาร', 'success');
+            syncDataWithBackend(false);
         } else {
-            showToast((json && (json.message || json.error)) || 'ซิงค์ไม่สำเร็จ', 'error');
+            showToast('การซิงค์มีปัญหา: ' + (json.error || 'โปรดดู Apps Script log'), 'error');
         }
-    } catch (err) {
-        showToast('ซิงค์ไม่สำเร็จ: ' + err.message, 'error');
+    } catch (e) {
+        showToast('ไม่สามารถเชื่อมต่อ Facebook Sync ได้', 'error');
     }
 };
+
 
 // ==============================================================================
 // 11. HELPER UTILITIES
